@@ -111,4 +111,18 @@ export class ApplicationsService {
     }
   }
 
+  async setUnitIDForUser(user_uuid: string) {
+    const user = await this.userModel.findOne({ where: { uuid: user_uuid }})
+    const response = await this.unit.applications.get('360995')
+    const unit_id = response.data.relationships.customer.data.id
+    
+    try {
+      await user.$set('unit_id', unit_id)
+
+      return user
+    } catch (err) { return err }
+  }
+
+  // async getApplicationStatus
+
 }

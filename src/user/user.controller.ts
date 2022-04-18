@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './models/user.model';
+import { isEmpty, Subject } from 'rxjs';
+import _ from 'lodash';
 
 @Controller('user')
 export class UserController {
@@ -19,7 +21,15 @@ export class UserController {
 
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
-    return this.userService.findOne(uuid);
+
+    const user = this.userService.findOne(uuid);
+
+    // If we have a user, we need to check their application status from Unit and update any changes
+    try {
+      
+    } catch (err) { return err }
+
+    return user;
   }
 
   // @Post(':uuid/profile')

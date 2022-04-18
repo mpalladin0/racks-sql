@@ -43,6 +43,7 @@ export class UserService {
     return `This action returns all user`;
   }
 
+
   async findOne(uuid: string): Promise<User> {
     try {
       return await this.userModel.findOne({
@@ -62,6 +63,16 @@ export class UserService {
     } catch (err) {
       return err
     }
+  }
+
+  async findOneByEmail(email: string): Promise<User> {
+    try {
+      return await this.userModel.findOne({
+        where: {
+          email: email
+        }
+      })
+    } catch (err) { return err }
   }
 
   // async createProfile(uuid: string, createProfileDto: CreateProfileDto) {

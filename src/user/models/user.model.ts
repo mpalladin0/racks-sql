@@ -15,6 +15,9 @@ export class User  extends Model {
     @Column({ allowNull: false, validate: { notNull: true, notEmpty: true } })
     public password!: string
 
+    @Column
+    public unit_id: number;
+
     @HasMany(() => Profile)
     profile: Profile[]
 
