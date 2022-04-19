@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateApplicationFormRequest, CreateApplicationFormResponse, Unit, UnitResponse } from '@unit-finance/unit-node-sdk';
+import { UserAuthenticatedEvent } from 'src/auth/user-authenticated.event';
 import { Name } from 'src/profile/models/name.model';
 import { Profile } from 'src/profile/models/profile.model';
 import { User } from 'src/user/models/user.model';
@@ -123,6 +125,34 @@ export class ApplicationsService {
     } catch (err) { return err }
   }
 
-  // async getApplicationStatus
+  @OnEvent('user.refresh.applications')
+  async refreshApplicationStatus(payload: UserAuthenticatedEvent) {
+    const { user_uuid, applications } = payload.payload;
+
+    applications.forEach(async application => {
+      switch (application.status) {
+        /**
+         * Pending:
+         * Use unit_id to check the application status on Unit, update if changed.
+         */
+        case 'pending': {
+          console.log('Penidnggvsd')
+          const unit_application = await this.unit.applications.get(application.unit_id)
+          console.log(unit_application)
+
+        }
+
+        break;
+        case 'approved': {
+          console.log('approved')
+        }
+
+
+        default:
+          console.log('unknown/null application status')
+      }
+    });
+    console.log("Refreshing user application", user_uuid)
+  }
 
 }

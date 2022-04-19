@@ -1,6 +1,6 @@
 import { UUID } from "sequelize";
 import { UUIDV4 } from "sequelize";
-import { Column, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
+import { Column, HasMany, Model, Table } from "sequelize-typescript";
 import { Application } from "src/applications/models/application.model";
 import { Profile } from "src/profile/models/profile.model";
 

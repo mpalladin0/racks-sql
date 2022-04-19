@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { Profile } from 'src/profile/models/profile.model';
 import { Name } from 'src/profile/models/name.model';
 import { Application } from 'src/applications/models/application.model';
+import { Applications } from '@unit-finance/unit-node-sdk';
 
 
 @Injectable()
@@ -70,7 +71,12 @@ export class UserService {
       return await this.userModel.findOne({
         where: {
           email: email
-        }
+        }, 
+        include: [
+          {
+            model: Application
+          }
+        ]
       })
     } catch (err) { return err }
   }

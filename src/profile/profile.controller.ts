@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/profile/create-profile.dto';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('profile')
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
@@ -11,6 +13,7 @@ export class ProfileController {
     return this.profileService.findOneByUserUUID(user_uuid);
   }
 
+  @ApiBody({ type: [CreateProfileDto] })
   @Post(':user_uuid/create')
   findOneProfile(@Param('user_uuid') user_uuid: string, @Body() createProfileDto: CreateProfileDto) {
     return this.profileService.createProfile(user_uuid, createProfileDto)

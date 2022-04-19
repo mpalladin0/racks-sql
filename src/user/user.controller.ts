@@ -4,7 +4,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './models/user.model';
 import { isEmpty, Subject } from 'rxjs';
 import _ from 'lodash';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -14,26 +16,12 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
   @Get(':uuid')
-  findOne(@Param('uuid') uuid: string) {
-
-    const user = this.userService.findOne(uuid);
-
-    // If we have a user, we need to check their application status from Unit and update any changes
+  findOne(@Param('uuid') uuid: string): Promise<User> {
     try {
-      
-    } catch (err) { return err }
-
-    return user;
+      return this.userService.findOne(uuid);
+    } catch (err) { 
+      return err }
   }
 
-  // @Post(':uuid/profile')
-  // findOneProfile(@Param('uuid') uuid: string, @Body() createProfileDto: CreateProfileDto) {
-  //   return this.userService.createProfile(uuid, createProfileDto)
-  // }
 }
