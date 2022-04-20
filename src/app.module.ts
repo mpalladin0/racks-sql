@@ -11,7 +11,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
-    EventEmitterModule.forRoot(),
+    EventEmitterModule.forRoot({
+      wildcard: true,
+    }),
     SequelizeModule.forRoot({
       dialect: 'sqlite',
       storage: './test/db.sqlite',

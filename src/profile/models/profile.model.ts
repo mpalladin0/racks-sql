@@ -7,16 +7,16 @@ import { Residence } from "./residence.model";
 
 @Table
 export class Profile extends Model {
-    @Column({ type: UUID, defaultValue: UUIDV4, primaryKey: true   })
+    @Column({ type: UUID, defaultValue: UUIDV4, primaryKey: true })
     profile_uuid: string
 
-    @HasMany(() => Name)
+    @HasMany(() => Name, { onDelete: 'CASCADE', hooks: true })
     name: Name[]
 
     @Column
     dob: string
 
-    @HasMany(() => Residence)
+    @HasMany(() => Residence, { onDelete: 'CASCADE', hooks: true })
     residence: Residence[]
 
     @ForeignKey(() => User)

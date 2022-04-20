@@ -1,21 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './models/user.model';
+import { User as UserModel } from './models/user.model';
 import * as bcrypt from 'bcrypt';
-import { Profile } from 'src/profile/models/profile.model';
-import { Name } from 'src/profile/models/name.model';
-import { Application } from 'src/applications/models/application.model';
+import { Profile as ProfileModel } from 'src/profile/models/profile.model';
+import { Name as NameModel } from 'src/profile/models/name.model';
+import { Application as ApplicationModel } from 'src/applications/models/application.model';
 import { Applications } from '@unit-finance/unit-node-sdk';
+import { Residence as ResidenceModel } from 'src/profile/models/residence.model';
 
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User) private readonly userModel: typeof User,
+    @InjectModel(UserModel) private readonly userModel: typeof UserModel,
     ) {} 
 
-  public async createUser(createUserDto: CreateUserDto): Promise<User> {
+  public async createUser(createUserDto: CreateUserDto): Promise<UserModel> {
     try {
       const hashedPassword = await this.hashPasswordBeforeCreate(createUserDto.password);
 
@@ -45,20 +46,24 @@ export class UserService {
   }
 
 
-  async findOne(uuid: string): Promise<User> {
+  async findOne(uuid: string): Promise<UserModel> {
     try {
       return await this.userModel.findOne({
         where: {
           uuid,
         },
         include: [
-          {
-            model: Profile,
-            include: [Name]
+          { 
+            model: ProfileModel,
+            include: [
+              { model: NameModel },
+              { model: ResidenceModel }
+            ]
           },
           {
-            model: Application
-          }
+            model: ApplicationModel
+          },
+          
         ]
       })
     } catch (err) {
@@ -66,7 +71,7 @@ export class UserService {
     }
   }
 
-  async findOneByEmail(email: string): Promise<User> {
+  async findOneByEmail(email: string): Promise<UserModel> {
     try {
       return await this.userModel.findOne({
         where: {
@@ -74,31 +79,10 @@ export class UserService {
         }, 
         include: [
           {
-            model: Application
+            model: ApplicationModel
           }
         ]
       })
     } catch (err) { return err }
   }
-
-  // async createProfile(uuid: string, createProfileDto: CreateProfileDto) {
-  //   try {
-  //     const profile = await this.profileModel.create({
-  //       first_name: createProfileDto.name.first,
-  //       middle_name: createProfileDto.name.middle,
-  //       last_name: createProfileDto.name.last,
-  //     })
-
-  //     const user = await this.findOne(uuid);
-
-  //     user.$add('profile', profile);
-  //     user.save();
-
-  //     return user;
-
-  //   } catch (err) {
-  //     return err
-  //   }
-  // }
-
 }

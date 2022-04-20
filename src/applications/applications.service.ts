@@ -136,18 +136,19 @@ export class ApplicationsService {
          * Use unit_id to check the application status on Unit, update if changed.
          */
         case 'pending': {
-          console.log('Penidnggvsd')
-          const unit_application = await this.unit.applications.get(application.unit_id)
-          console.log(unit_application)
+          console.log('Application Pending')
+          // const unit_application = await this.unit.applications.get(application.unit_id)
+          // console.log(unit_application)
 
         }
 
         break;
         case 'approved': {
-          console.log('approved')
+          console.log('Application Approved')
         }
 
 
+        break;
         default:
           console.log('unknown/null application status')
       }
