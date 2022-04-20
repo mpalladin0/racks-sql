@@ -7,6 +7,7 @@ import { ClearingPeriodsModel } from './models/clearing_periods.model';
 import { DepositProductModel } from './models/deposit_product.model';
 import { FeesModel } from './models/fees.model';
 import { LimitsModel } from './models/limits.model';
+import { LimitsDurationModel } from './models/limits.durations.model';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LimitsModel } from './models/limits.model';
       DepositProductModel,
       FeesModel,
       LimitsModel,
+      LimitsDurationModel,
     ]),
   ],
   controllers: [AccountsController],

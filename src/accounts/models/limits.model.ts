@@ -1,6 +1,7 @@
 import { UUID, UUIDV4 } from "sequelize";
-import { BelongsTo, Column, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { DepositProductModel } from "./deposit_product.model";
+import { LimitsDurationModel } from "./limits.durations.model";
 
 @Table
 export class LimitsModel extends Model {
@@ -16,5 +17,17 @@ export class LimitsModel extends Model {
 
     /**
      * Everything below associated with Limits
-     */    
+     */
+
+    @HasMany(() => LimitsDurationModel, 'debit')
+    debit: LimitsDurationModel[]
+
+    @HasMany(() => LimitsDurationModel, 'credit')
+    credit: LimitsDurationModel[]
+    
+    @HasMany(() => LimitsDurationModel, 'atm_withdrawl')
+    atm_withdrawl: LimitsDurationModel[]
+
+    @HasMany(() => LimitsDurationModel, 'deposit')
+    deposit: LimitsDurationModel[]
 }

@@ -13,6 +13,7 @@ import { LimitsModel } from 'src/accounts/models/limits.model';
 import { ClearingPeriodsModel } from 'src/accounts/models/clearing_periods.model';
 import { FeesModel } from 'src/accounts/models/fees.model';
 import { DepositProductModel } from 'src/accounts/models/deposit_product.model';
+import { LimitsDurationModel } from 'src/accounts/models/limits.durations.model';
 
 
 @Injectable()
@@ -76,7 +77,15 @@ export class UserService {
                 include: [
                   { model: ClearingPeriodsModel },
                   { model: FeesModel },
-                  { model: LimitsModel },
+                  { 
+                    model: LimitsModel,
+                    include: [
+                      { model: LimitsDurationModel, as: 'debit', attributes: ['daily', 'weekly', 'monthly']},
+                      { model: LimitsDurationModel, as: 'credit', attributes: ['daily', 'weekly', 'monthly']},
+                      { model: LimitsDurationModel, as: 'atm_withdrawl', attributes: ['daily', 'weekly', 'monthly']},
+                      { model: LimitsDurationModel, as: 'deposit', attributes: ['daily', 'weekly', 'monthly']},
+                    ]
+                  },
                 ]
               }
             ]

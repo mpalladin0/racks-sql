@@ -6,6 +6,7 @@ import { AccountModel } from './models/account.model';
 import { ClearingPeriodsModel } from './models/clearing_periods.model';
 import { DepositProductModel } from './models/deposit_product.model';
 import { FeesModel } from './models/fees.model';
+import { LimitsDurationModel } from './models/limits.durations.model';
 import { LimitsModel } from './models/limits.model';
 // import { CreateAccountDto } from './dto/create-account.dto';
 // import { UpdateAccountDto } from './dto/update-account.dto';
@@ -25,7 +26,15 @@ export class AccountsService {
             model: DepositProductModel, 
             include: [
               { model: FeesModel },
-              { model: LimitsModel },
+              { 
+                model: LimitsModel, 
+                include: [
+                  { model: LimitsDurationModel, as: 'debit', attributes: ['daily', 'weekly', 'monthly'] },
+                  { model: LimitsDurationModel, as: 'credit', attributes: ['daily', 'weekly', 'monthly'] },
+                  { model: LimitsDurationModel, as: 'atm_withdrawl', attributes: ['daily', 'weekly', 'monthly'] },
+                  { model: LimitsDurationModel, as: 'deposit', attributes: ['daily', 'weekly', 'monthly']  },
+                ] 
+              },
               { model: ClearingPeriodsModel }
             ]
           }
@@ -40,6 +49,28 @@ export class AccountsService {
               atm_in_network: 1.25,
               atm_out_network: 1.25,
             }],
+            limits: [{
+              debit: [{
+                daily: 300,
+                weekly: 2100,
+                monthly: 8400,
+              }],
+              credit: [{
+                daily: 300,
+                weekly: 2100,
+                monthly: 8400,
+              }],
+              atm_withdrawl: [{
+                daily: 300,
+                weekly: 2100,
+                monthly: 8400,
+              }],
+              deposit: [{
+                daily: 300,
+                weekly: 2100,
+                monthly: 8400,
+              }],
+            }]
           }],
         },
       })
@@ -59,7 +90,15 @@ export class AccountsService {
           model: DepositProductModel,
           include: [
             { model: FeesModel },
-            { model: LimitsModel },
+            { 
+              model: LimitsModel,
+              include: [
+                { model: LimitsDurationModel, as: 'debit', attributes: ['daily', 'weekly', 'monthly'] },
+                { model: LimitsDurationModel, as: 'credit', attributes: ['daily', 'weekly', 'monthly'] },
+                { model: LimitsDurationModel, as: 'deposit', attributes: ['daily', 'weekly', 'monthly'] },
+                { model: LimitsDurationModel, as: 'atm_withdrawl', attributes: ['daily', 'weekly', 'monthly'] },
+              ]
+            },
             { model: ClearingPeriodsModel }
           ]
         }
