@@ -1,12 +1,12 @@
 import { UUID } from "sequelize";
 import { UUIDV4 } from "sequelize";
 import { Column, HasMany, Model, Table } from "sequelize-typescript";
-import { Account } from "src/accounts/models/account.model";
+import { AccountModel } from "src/accounts/models/account.model";
 import { Application } from "src/applications/models/application.model";
 import { Profile } from "src/profile/models/profile.model";
 
 @Table
-export class User  extends Model {
+export class User extends Model {
     @Column({ type: UUID, defaultValue: UUIDV4, primaryKey: true   })
     uuid: string
 
@@ -25,7 +25,7 @@ export class User  extends Model {
     @HasMany(() => Application)
     applications: Application[]
 
-    // @HasMany(() => Account)
-    // accounts: Account[]
+    @HasMany(() => AccountModel)
+    accounts: AccountModel[]
 
 }

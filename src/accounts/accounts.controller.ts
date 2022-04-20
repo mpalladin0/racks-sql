@@ -2,35 +2,52 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ApiTags } from '@nestjs/swagger';
 import { AccountsService } from './accounts.service';
 import { CreateAccountDto } from './dto/create-account.dto';
-import { UpdateAccountDto } from './dto/update-account.dto';
 
 @ApiTags('accounts')
 @Controller('accounts')
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
-  @Post()
-  create(@Body() createAccountDto: CreateAccountDto) {
-    return this.accountsService.create(createAccountDto);
+  @Post(':user_uuid/create')
+  async createAccount(@Param('user_uuid') user_uuid: string, @Body() createAccountDto: CreateAccountDto) {
+    return await this.accountsService.createAccount(user_uuid, createAccountDto);
   }
 
-  @Get()
-  findAll() {
-    return this.accountsService.findAll();
+  @Get(':user_uuid/all')
+  async findAll(@Param('user_uuid') user_uuid: string) {
+    return await this.accountsService.findAllByUserUUID(user_uuid);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.accountsService.findOne(+id);
+  @Delete(':user_uuid/all/delete')
+  deleteAllAccounts(@Param('user_uuid') user_uuid: string) {
+    return this.accountsService.deleteAllAccountsByUserUUID(user_uuid);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
-    return this.accountsService.update(+id, updateAccountDto);
+  @Delete(':user_uuid/:account_uuid/delete')
+  deleteAccountByAccountUUID(
+    @Param('user_uuid') user_uuid: string,
+    @Param('account_uuid') account_uuid: string,
+    ) {
+    return this.accountsService.deleteAccountByAccountUUID(user_uuid, account_uuid);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.accountsService.remove(+id);
-  }
+  // @Get()
+  // findAll() {
+  //   return this.accountsService.findAll();
+  // }
+
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.accountsService.findOne(+id);
+  // }
+
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
+  //   return this.accountsService.update(+id, updateAccountDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.accountsService.remove(+id);
+  // }
 }

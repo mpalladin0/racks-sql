@@ -73,24 +73,6 @@ export class ProfileService {
     } catch (err) {
       return err;
     }
-
-
-    
-
-    // const Profile = await User.$create('profile', {
-    //   user_uuid: user_uuid, 
-    //   name: [{
-    //     first: createProfileDto.name.first,
-    //     middle: createProfileDto.name.middle,
-    //     last: createProfileDto.name.last,
-    //   }]
-    // }, {
-    //   include: [NameModel, UserModel]
-    // })
-
-    // this.eventEmitter.emit('profile.create', new ProfileCreatedEvent(user_uuid))
-
-    // return Profile;
   }
 
   @OnEvent('profile.deleted')
