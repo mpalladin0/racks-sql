@@ -29,7 +29,7 @@ export class Application extends Model {
     status: string
 
     @ForeignKey(() => User)
-    @Column
+    // @Column
     user_uuid: String;
 
     @BelongsTo(() => User)

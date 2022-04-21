@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/user/models/user.model';
 import { CreateAccountDto } from './dto/create-account.dto';
@@ -14,6 +15,7 @@ import { LimitsModel } from './models/limits.model';
 @Injectable()
 export class AccountsService {
   constructor(
+    private eventEmitter: EventEmitter2,
     @InjectModel(AccountModel) private readonly accountModel: typeof AccountModel,
   ) {}
 
@@ -45,7 +47,7 @@ export class AccountsService {
             purpose: createAccountDto.deposit_product.purpose,
             tier: createAccountDto.deposit_product.tier,
             fees: [{
-              ach_transer: 1.25,
+              ach_transfer: 1.25,
               atm_in_network: 1.25,
               atm_out_network: 1.25,
             }],
@@ -85,6 +87,7 @@ export class AccountsService {
 
   async findAllByUserUUID(user_uuid: string) {
     try {
+      this.eventEmitter.emit('account.status.refresh')
       return await this.accountModel.findAll({ where: { user_uuid: user_uuid }, include: [
         { 
           model: DepositProductModel,
@@ -131,5 +134,10 @@ export class AccountsService {
       return err
     }
 
+  }
+
+  @OnEvent('account.status.*')
+  async handleAccountStatusEvents() {
+    console.log("Checking account status..")
   }
 }

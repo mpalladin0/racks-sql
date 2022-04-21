@@ -24,7 +24,7 @@ export class Residence extends Model {
     address: string
 
     @ForeignKey(() => Profile)
-    @Column
+    // @Column
     profile_uuid: String;
 
     @BelongsTo(() => Profile)

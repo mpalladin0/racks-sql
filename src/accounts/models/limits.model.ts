@@ -9,7 +9,7 @@ export class LimitsModel extends Model {
     limits_uuid: string;
 
     @ForeignKey(() => DepositProductModel)
-    @Column
+    // @Column
     deposit_product_uuid: string;
 
     @BelongsTo(() => DepositProductModel)

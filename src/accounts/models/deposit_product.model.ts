@@ -14,7 +14,7 @@ export class DepositProductModel extends Model {
     deposit_product_uuid: string;
 
     @ForeignKey(() => AccountModel)
-    @Column
+    // @Column
     account_uuid: string;
 
     @BelongsTo(() => AccountModel)

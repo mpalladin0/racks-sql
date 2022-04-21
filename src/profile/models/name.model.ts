@@ -18,7 +18,7 @@ export class Name extends Model {
     last: string
 
     @ForeignKey(() => Profile)
-    @Column
+    // @Column
     profile_uuid: String;
 
     @BelongsTo(() => Profile)

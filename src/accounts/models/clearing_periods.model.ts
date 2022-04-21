@@ -8,7 +8,7 @@ export class ClearingPeriodsModel extends Model {
     clearing_periods_uuid: string;
 
     @ForeignKey(() => DepositProductModel)
-    @Column
+    // @Column
     deposit_product_uuid: string;
 
     @BelongsTo(() => DepositProductModel)

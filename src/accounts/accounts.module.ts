@@ -13,8 +13,8 @@ import { LimitsDurationModel } from './models/limits.durations.model';
   imports: [
     SequelizeModule.forFeature([
       AccountModel, 
-      ClearingPeriodsModel, 
       DepositProductModel,
+      ClearingPeriodsModel, 
       FeesModel,
       LimitsModel,
       LimitsDurationModel,

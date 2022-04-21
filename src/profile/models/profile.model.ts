@@ -10,17 +10,17 @@ export class Profile extends Model {
     @Column({ type: UUID, defaultValue: UUIDV4, primaryKey: true })
     profile_uuid: string
 
-    @HasMany(() => Name, { onDelete: 'CASCADE', hooks: true })
+    @HasMany(() => Name)
     name: Name[]
 
     @Column
     dob: string
 
-    @HasMany(() => Residence, { onDelete: 'CASCADE', hooks: true })
+    @HasMany(() => Residence)
     residence: Residence[]
 
     @ForeignKey(() => User)
-    @Column
+    // @Column
     user_uuid: String;
 
     @BelongsTo(() => User)

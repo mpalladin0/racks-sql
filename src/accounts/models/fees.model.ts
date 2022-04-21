@@ -1,4 +1,4 @@
-import { UUID, UUIDV4 } from "sequelize";
+import { DataTypes, Sequelize, UUID, UUIDV4 } from "sequelize";
 import { BelongsTo, Column, ForeignKey, Model, Table } from "sequelize-typescript";
 import { DepositProductModel } from "./deposit_product.model";
 
@@ -8,7 +8,7 @@ export class FeesModel extends Model {
     fees_uuid: string;
 
     @ForeignKey(() => DepositProductModel)
-    @Column
+    // @Column
     deposit_product_uuid: string;
 
     @BelongsTo(() => DepositProductModel)
@@ -18,13 +18,13 @@ export class FeesModel extends Model {
      * Everything below associated with Fees
      */
 
-    @Column({ allowNull: false, defaultValue: 1.25 })
-    ach_transer: number
+    @Column({ allowNull: false, defaultValue: 1.25, type: DataTypes.DOUBLE })
+    ach_transfer: typeof DataTypes.DOUBLE
 
-    @Column({ allowNull: false, defaultValue: 1.25 })
+    @Column({ allowNull: false, defaultValue: 1.25, type: DataTypes.DOUBLE })
     atm_in_network: number
 
-    @Column({ allowNull: false, defaultValue: 2.25 })
+    @Column({ allowNull: false, defaultValue: 2.25, type: DataTypes.DOUBLE })
     atm_out_network: number
 
 }

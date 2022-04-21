@@ -1,4 +1,4 @@
-import { UUID, UUIDV4 } from "sequelize";
+import { DataTypes, UUID, UUIDV4 } from "sequelize";
 import { BelongsTo, Column, ForeignKey, Model, Table } from "sequelize-typescript";
 import { DepositProductModel } from "./deposit_product.model";
 import { LimitsModel } from "./limits.model";
@@ -9,7 +9,7 @@ export class LimitsDurationModel extends Model {
     limits_duration_uuid: string;
 
     @ForeignKey(() => LimitsModel)
-    @Column
+    // @Column
     limits_uuid: string;
 
     @BelongsTo(() => LimitsModel, 'limits_uuid')
@@ -19,13 +19,13 @@ export class LimitsDurationModel extends Model {
      * Everything below associated with LimitsDuration
      */
 
-    @Column({ allowNull: false, defaultValue: 300 })
+    @Column({ allowNull: false, defaultValue: 300, type: DataTypes.DOUBLE })
     daily: number
 
-    @Column({ allowNull: false, defaultValue: 2100 })
+    @Column({ allowNull: false, defaultValue: 2100, type: DataTypes.DOUBLE })
     weekly: number
 
-    @Column({ allowNull: false, defaultValue: 8400 })
+    @Column({ allowNull: false, defaultValue: 8400, type: DataTypes.DOUBLE })
     monthly: number
 
 }
