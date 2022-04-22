@@ -9,7 +9,17 @@ import { ProfileModule } from './profile/profile.module';
 import { AuthModule } from './auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DB_DATABASE, DB_DIALECT, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } from 'secrets/secrets.constants';
-
+import { AdminModule } from '@adminjs/nestjs';
+import { User } from './user/models/user.model';
+import { Profile } from './profile/models/profile.model';
+import { Name } from './profile/models/name.model';
+import { Residence } from './profile/models/residence.model';
+import { Application } from './applications/models/application.model';
+import { AccountModel } from './accounts/models/account.model';
+import { ClearingPeriodsModel } from './accounts/models/clearing_periods.model';
+import { DepositProductModel } from './accounts/models/deposit_product.model';
+import { FeesModel } from './accounts/models/fees.model';
+import { LimitsModel } from './accounts/models/limits.model';
 @Module({
   imports: [
     EventEmitterModule.forRoot({
@@ -29,21 +39,30 @@ import { DB_DATABASE, DB_DIALECT, DB_HOST, DB_PASSWORD, DB_PORT, DB_USERNAME } f
       dialectOptions: { 
         ssl: { require: true, rejectUnauthorized: false }
       },
-  
-      // dialect: 'mssql',
-      // dialectModule: tedious,
-      // database: 'racks',
-      // username: 'racksadmin',
-      // password: 'cepFem-jigme4-gemdej',
-      // host: 'racks.database.windows.net',
-      // autoLoadModels: true,
-      // synchronize: true,
     }),
     UserModule,
     AccountsModule,
     ApplicationsModule,
     ProfileModule,
-    AuthModule
+    AuthModule,
+    AdminModule.createAdmin({
+      adminJsOptions: {
+        rootPath: '/admin',
+        resources: [
+          User,
+          Profile,
+          Name,
+          Residence,
+          Application,
+          AccountModel,
+          ClearingPeriodsModel,
+          DepositProductModel,
+          FeesModel,
+          LimitsModel
+        ],
+
+      }
+    })
   ],
   controllers: [AppController],
   providers: [AppService],

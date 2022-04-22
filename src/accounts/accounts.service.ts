@@ -87,7 +87,6 @@ export class AccountsService {
 
   async findAllByUserUUID(user_uuid: string) {
     try {
-      this.eventEmitter.emit('account.status.refresh')
       return await this.accountModel.findAll({ where: { user_uuid: user_uuid }, include: [
         { 
           model: DepositProductModel,

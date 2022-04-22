@@ -26,7 +26,7 @@ export class Application extends Model {
     unit_id: string
 
     @Column({ defaultValue: 'pending' })
-    status: string
+    status: ApplicationStatus
 
     @ForeignKey(() => User)
     // @Column

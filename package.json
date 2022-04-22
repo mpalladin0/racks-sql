@@ -21,6 +21,10 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@adminjs/express": "^4.1.0",
+    "@adminjs/nestjs": "^4.0.1",
+    "@adminjs/sequelize": "^2.1.5",
+    "@nestjs/axios": "^0.0.7",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/event-emitter": "^1.1.0",
@@ -31,7 +35,11 @@
     "@nestjs/sequelize": "^8.0.0",
     "@nestjs/swagger": "^5.2.1",
     "@unit-finance/unit-node-sdk": "^0.9.18",
+    "adminjs": "^5.9.10",
     "bcrypt": "^5.0.1",
+    "express": "^4.17.3",
+    "express-formidable": "^1.2.0",
+    "express-session": "^1.17.2",
     "mysql2": "^2.3.3",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",

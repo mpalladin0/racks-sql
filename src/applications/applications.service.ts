@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpService, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateApplicationFormRequest, CreateApplicationFormResponse, Unit, UnitResponse } from '@unit-finance/unit-node-sdk';
@@ -8,6 +8,7 @@ import { Profile } from 'src/profile/models/profile.model';
 import { User } from 'src/user/models/user.model';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
+import { ApplicationRefreshStatusEvent } from './event/ApplicationRefreshStatus.event';
 import { Application } from './models/application.model';
 
 const UNIT_TOKEN = 'v2.public.eyJyb2xlIjoiYWRtaW4iLCJ1c2VySWQiOiIxNzE1Iiwic3ViIjoicGxhbnRfc2xhY2tlcjBuQGljbG91ZC5jb20iLCJleHAiOiIyMDIzLTA0LTE0VDE2OjMxOjIzLjYyOVoiLCJqdGkiOiIxMzUwOTgiLCJvcmdJZCI6Ijk5NSIsInNjb3BlIjoiYXBwbGljYXRpb25zIGFwcGxpY2F0aW9ucy13cml0ZSBjdXN0b21lcnMgY3VzdG9tZXJzLXdyaXRlIGN1c3RvbWVyLXRhZ3Mtd3JpdGUgY3VzdG9tZXItdG9rZW4td3JpdGUgYWNjb3VudHMgYWNjb3VudHMtd3JpdGUgY2FyZHMgY2FyZHMtd3JpdGUgY2FyZHMtc2Vuc2l0aXZlIGNhcmRzLXNlbnNpdGl2ZS13cml0ZSB0cmFuc2FjdGlvbnMgdHJhbnNhY3Rpb25zLXdyaXRlIGF1dGhvcml6YXRpb25zIHN0YXRlbWVudHMgcGF5bWVudHMgcGF5bWVudHMtd3JpdGUgcGF5bWVudHMtd3JpdGUtY291bnRlcnBhcnR5IHBheW1lbnRzLXdyaXRlLWFjaC1kZWJpdCBjb3VudGVycGFydGllcyBjb3VudGVycGFydGllcy13cml0ZSBiYXRjaC1yZWxlYXNlcyBiYXRjaC1yZWxlYXNlcy13cml0ZSB3ZWJob29rcyB3ZWJob29rcy13cml0ZSBldmVudHMgZXZlbnRzLXdyaXRlIGF1dGhvcml6YXRpb24tcmVxdWVzdHMgYXV0aG9yaXphdGlvbi1yZXF1ZXN0cy13cml0ZSBjaGVjay1kZXBvc2l0cyBjaGVjay1kZXBvc2l0cy13cml0ZSByZWNlaXZlZC1wYXltZW50cyByZWNlaXZlZC1wYXltZW50cy13cml0ZSBkaXNwdXRlcyBjaGFyZ2ViYWNrcyBjaGFyZ2ViYWNrcy13cml0ZSByZXdhcmRzIHJld2FyZHMtd3JpdGUiLCJvcmciOiJCb29tIiwic291cmNlSXAiOiIiLCJ1c2VyVHlwZSI6Im9yZyIsImlzVW5pdFBpbG90IjpmYWxzZX17wiw8WXgy-cwxzerOBxjD6jZDJv6YLCQK36uXEfT5vrxDOsXnBQo15Al_hvg9yL5qTY-CVbltsh_d125-A4cD'
@@ -125,35 +126,47 @@ export class ApplicationsService {
     } catch (err) { return err }
   }
 
-  @OnEvent('user.refresh.applications')
-  async refreshApplicationStatus(payload: UserAuthenticatedEvent) {
-    const { user_uuid, applications } = payload.payload;
+  @OnEvent('applications.status.refresh')
+  async refreshApplicationStatus(event: ApplicationRefreshStatusEvent) {
+    const Applications = await this.applicationModel.findAll({ where: { user_uuid: event.user_uuid }})
 
-    applications.forEach(async application => {
-      switch (application.status) {
-        /**
-         * Pending:
-         * Use unit_id to check the application status on Unit, update if changed.
-         */
-        case 'pending': {
-          console.log('Application Pending')
-          // const unit_application = await this.unit.applications.get(application.unit_id)
-          // console.log(unit_application)
+    // pending = 'pending',
+    // pending_review = 'pending_review',
+    // approved = 'approved',
+    // denied = 'denied',
+    // awaiting_documents = 'awaiting_documents'
 
-        }
+
+    Applications.forEach(async application_form => {
+      const { status } = application_form;
+
+      switch (status) {
+        case 'pending': 
+          console.log(application_form.unit_id);
+
+
+          const { data } = await this.unit.applicationForms.get(application_form.unit_id)
+          console.log(data.attributes.stage)
 
         break;
-        case 'approved': {
-          console.log('Application Approved')
-        }
+        case 'pending_review': 
 
+
+        break;
+        case 'approved':
+
+        break;
+        case 'denied':
+
+        break;
+
+        case 'awaiting_documents':
 
         break;
         default:
-          console.log('unknown/null application status')
+          return new Error(`Unknown status ${status}`)
       }
-    });
-    console.log("Refreshing user application", user_uuid)
+    })
   }
 
 }

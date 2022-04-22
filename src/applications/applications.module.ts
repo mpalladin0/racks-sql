@@ -5,9 +5,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from 'src/user/models/user.model';
 import { Application } from './models/application.model';
 import { UserModule } from 'src/user/user.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    HttpModule,
     UserModule,
     SequelizeModule.forFeature([Application])
   ],

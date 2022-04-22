@@ -13,14 +13,6 @@ const UNIT_TOKEN = 'v2.public.eyJyb2xlIjoiYWRtaW4iLCJ1c2VySWQiOiIxNzE1Iiwic3ViIj
 const UNIT_API_URL = 'https://api.s.unit.sh/'
 @Table
 export class AccountModel extends Model {
-    private static unit = new Unit(UNIT_TOKEN, UNIT_API_URL)
-
-    @OnEvent('account.status.refresh')
-    static async fetchStatus(Account: AccountModel) {
-        console.log("Refreshing status...")
-        console.log(" GETTING THE STATUS FOR ", Account.status)
-    }
-
     @Column({ type: UUID, defaultValue: UUIDV4, primaryKey: true, })
     account_uuid: string
 
