@@ -1,0 +1,1 @@
+{"version":3,"file":"user-authenticated.event.js","sourceRoot":"","sources":["../../src/auth/user-authenticated.event.ts"],"names":[],"mappings":";;;AAAA,MAAa,sBAAsB;IAI/B,YAAY,IAAY,EAAE,OAAoB;QAC1C,IAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,IAAI,CAAC,OAAO,GAAG,OAAO,CAAC,CAAC,CAAC,OAAO,CAAC,CAAC,CAAC,IAAI,CAAA;IAC3C,CAAC;CACJ;AARD,wDAQC"}
