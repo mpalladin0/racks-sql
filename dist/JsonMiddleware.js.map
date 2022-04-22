@@ -1,1 +1,0 @@
-{"version":3,"file":"JsonMiddleware.js","sourceRoot":"","sources":["../src/JsonMiddleware.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAA2D;AAC3D,6CAAkC;AAGlC,IAAa,kBAAkB,GAA/B,MAAa,kBAAkB;IAC7B,GAAG,CAAC,GAAY,EAAE,GAAa,EAAE,IAAe;QAC9C,IAAA,kBAAI,GAAE,CAAC,GAAU,EAAE,GAAU,EAAE,IAAI,CAAC,CAAA;IACtC,CAAC;CACF,CAAA;AAJY,kBAAkB;IAD9B,IAAA,mBAAU,GAAE;GACA,kBAAkB,CAI9B;AAJY,gDAAkB"}
