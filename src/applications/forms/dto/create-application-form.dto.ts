@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class CreateApplicationDto {
+export class CreateApplicationFormDto {
     @ApiProperty()
     user_uuid: string
 }

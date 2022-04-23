@@ -5,7 +5,6 @@ import { User as UserModel } from './models/user.model';
 import * as bcrypt from 'bcrypt';
 import { Profile as ProfileModel } from 'src/profile/models/profile.model';
 import { Name as NameModel } from 'src/profile/models/name.model';
-import { Application as ApplicationModel } from 'src/applications/models/application.model';
 import { Applications } from '@unit-finance/unit-node-sdk';
 import { Residence as ResidenceModel } from 'src/profile/models/residence.model';
 import { AccountModel } from 'src/accounts/models/account.model';
@@ -14,6 +13,9 @@ import { ClearingPeriodsModel } from 'src/accounts/models/clearing_periods.model
 import { FeesModel } from 'src/accounts/models/fees.model';
 import { DepositProductModel } from 'src/accounts/models/deposit_product.model';
 import { LimitsDurationModel } from 'src/accounts/models/limits.durations.model';
+import { ApplicationModel } from 'src/applications/application.model';
+import { ApplicationFormModel } from 'src/applications/forms/application-form.model';
+import { ApplicationDocumentsModel } from 'src/applications/documents/application-documents.model';
 
 
 @Injectable()
@@ -67,7 +69,11 @@ export class UserService {
             ]
           },
           {
-            model: ApplicationModel
+            model: ApplicationModel,
+            include: [
+              { model: ApplicationFormModel },
+              { model: ApplicationDocumentsModel }
+            ]
           },
           { 
             model: AccountModel,

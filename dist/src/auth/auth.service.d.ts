@@ -1,7 +1,6 @@
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { Unit } from '@unit-finance/unit-node-sdk';
-import { Application } from 'src/applications/models/application.model';
 import { User } from 'src/user/models/user.model';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 export interface UserAuthenticatedJWTPayload {
@@ -20,7 +19,7 @@ export declare class AuthService {
         email: string;
         unit_id: number;
         profile: import("../profile/models/profile.model").Profile[];
-        applications: Application[];
+        applications: import("../applications/application.model").ApplicationModel[];
         accounts: import("../accounts/models/account.model").AccountModel[];
         id?: any;
         createdAt?: any;

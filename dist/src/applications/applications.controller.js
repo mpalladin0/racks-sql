@@ -18,30 +18,43 @@ const swagger_1 = require("@nestjs/swagger");
 const unit_node_sdk_1 = require("@unit-finance/unit-node-sdk");
 const secrets_constants_1 = require("../../secrets/secrets.constants");
 const applications_service_1 = require("./applications.service");
-const create_application_dto_1 = require("./dto/create-application.dto");
-const application_model_1 = require("./models/application.model");
+const create_application_form_dto_1 = require("./forms/dto/create-application-form.dto");
+const application_model_1 = require("./application.model");
 let ApplicationsController = class ApplicationsController {
-    constructor(applicationsService) {
+    constructor(logger, applicationsService) {
+        this.logger = logger;
         this.applicationsService = applicationsService;
         this.unit = new unit_node_sdk_1.Unit(secrets_constants_1.UNIT_API_TOKEN, secrets_constants_1.UNTI_API_ENDPOINT_URL);
     }
-    create(createApplicationDto) {
-        return this.applicationsService.createApplication(createApplicationDto);
+    createApplicationForm(createApplicationForm) {
+        this.logger.warn("Creating Application...", createApplicationForm);
+        return this.applicationsService.createApplication(createApplicationForm);
     }
     findOneByApplicationUUID(application_uuid) {
-        return this.applicationsService.findOneByApplicationUUID(application_uuid);
+        return this.applicationsService.findOne_by_ApplicationUUID(application_uuid);
     }
     async findAllForUser(user_uuid) {
-        await this.applicationsService.setUnitIDForUser(user_uuid);
-        return this.applicationsService.findAllApplicationsByUserUUID(user_uuid);
+        return this.applicationsService.findAll_Applications_by_UserUUID(user_uuid);
     }
     async webhook(payload) {
         payload.data.forEach(response => {
             switch (response.type) {
-                case 'customer.updated':
+                case 'application.denied':
                     {
                         const res = response;
-                        console.log("Customer updated...", res.data.attributes.changes);
+                        console.log("New denied created", res);
+                    }
+                    break;
+                case 'application.awaitingDocuments':
+                    {
+                        const res = response;
+                        console.log("New awaitingDocuments created", res);
+                    }
+                    break;
+                case 'application.pendingReview':
+                    {
+                        const res = response;
+                        console.log("New pendingReview", res);
                     }
                     break;
                 case 'customer.created':
@@ -57,17 +70,17 @@ let ApplicationsController = class ApplicationsController {
     }
 };
 __decorate([
-    (0, swagger_1.ApiBody)({ type: [create_application_dto_1.CreateApplicationDto] }),
+    (0, swagger_1.ApiBody)({ type: [create_application_form_dto_1.CreateApplicationFormDto] }),
     (0, common_1.Post)('create'),
     (0, swagger_1.ApiCreatedResponse)({
-        description: 'The application has been successfully created.',
-        type: application_model_1.Application.name,
+        description: 'The application form has been successfully created.',
+        type: application_model_1.ApplicationModel.name,
     }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_application_dto_1.CreateApplicationDto]),
+    __metadata("design:paramtypes", [create_application_form_dto_1.CreateApplicationFormDto]),
     __metadata("design:returntype", void 0)
-], ApplicationsController.prototype, "create", null);
+], ApplicationsController.prototype, "createApplicationForm", null);
 __decorate([
     (0, common_1.Get)(':application_uuid'),
     __param(0, (0, common_1.Param)('application_uuid')),
@@ -92,7 +105,8 @@ __decorate([
 ApplicationsController = __decorate([
     (0, swagger_1.ApiTags)('applications'),
     (0, common_1.Controller)('applications'),
-    __metadata("design:paramtypes", [applications_service_1.ApplicationsService])
+    __metadata("design:paramtypes", [common_1.Logger,
+        applications_service_1.ApplicationsService])
 ], ApplicationsController);
 exports.ApplicationsController = ApplicationsController;
 //# sourceMappingURL=applications.controller.js.map

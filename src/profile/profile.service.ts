@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/sequelize';
 import { User as UserModel } from 'src/user/models/user.model';
@@ -21,19 +21,35 @@ export class ProfileService {
 
   async findOneByUserUUID(user_uuid: string) {
     try {
-      return await this.profileModel.findOne({ where: { user_uuid }, include: [
+      const Profile = await this.profileModel.findOne({ where: { user_uuid }, include: [
         { model: NameModel },
         { model: ResidenceModel }
       ]})
+
+      if (Profile === null) return new HttpException({
+        error: HttpStatus.NOT_FOUND,
+        status: `User ${user_uuid} does not have a profile.`,
+      }, HttpStatus.NOT_FOUND)
+
+      return Profile;
+
     } catch (err) { return err.message }
   }
 
   async findAllByUserUUID(user_uuid: string) {
     try {
-      return await this.profileModel.findAll({ where: { user_uuid }, include: [
+      const Profiles =  await this.profileModel.findAll({ where: { user_uuid }, include: [
         { model: NameModel },
         { model: ResidenceModel }
       ]})
+
+      if (Profiles.length == 0) return new HttpException({
+        error: HttpStatus.NOT_FOUND,
+        status: `User ${user_uuid} does not have a profile.`,
+      }, HttpStatus.NOT_FOUND)
+
+      return Profiles;
+
     } catch (err) { return err.message }
   }
 

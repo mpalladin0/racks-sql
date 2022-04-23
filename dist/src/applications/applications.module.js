@@ -11,10 +11,12 @@ const common_1 = require("@nestjs/common");
 const applications_service_1 = require("./applications.service");
 const applications_controller_1 = require("./applications.controller");
 const sequelize_1 = require("@nestjs/sequelize");
-const application_model_1 = require("./models/application.model");
+const application_form_model_1 = require("./forms/application-form.model");
 const user_module_1 = require("../user/user.module");
 const axios_1 = require("@nestjs/axios");
 const profile_module_1 = require("../profile/profile.module");
+const application_documents_model_1 = require("./documents/application-documents.model");
+const application_model_1 = require("./application.model");
 let ApplicationsModule = class ApplicationsModule {
 };
 ApplicationsModule = __decorate([
@@ -23,7 +25,11 @@ ApplicationsModule = __decorate([
             axios_1.HttpModule,
             profile_module_1.ProfileModule,
             user_module_1.UserModule,
-            sequelize_1.SequelizeModule.forFeature([application_model_1.Application])
+            sequelize_1.SequelizeModule.forFeature([
+                application_model_1.ApplicationModel,
+                application_form_model_1.ApplicationFormModel,
+                application_documents_model_1.ApplicationDocumentsModel,
+            ])
         ],
         controllers: [applications_controller_1.ApplicationsController],
         providers: [applications_service_1.ApplicationsService, common_1.Logger],

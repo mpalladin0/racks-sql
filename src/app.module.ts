@@ -14,12 +14,14 @@ import { User } from './user/models/user.model';
 import { Profile } from './profile/models/profile.model';
 import { Name } from './profile/models/name.model';
 import { Residence } from './profile/models/residence.model';
-import { Application } from './applications/models/application.model';
+import { ApplicationFormModel } from './applications/forms/application-form.model';
 import { AccountModel } from './accounts/models/account.model';
 import { ClearingPeriodsModel } from './accounts/models/clearing_periods.model';
 import { DepositProductModel } from './accounts/models/deposit_product.model';
 import { FeesModel } from './accounts/models/fees.model';
 import { LimitsModel } from './accounts/models/limits.model';
+import { ApplicationModel } from './applications/application.model';
+import { ApplicationDocumentsModel } from './applications/documents/application-documents.model';
 // import { WinstonModule, utilities } from 'nest-winston';
 // import winston from 'winston';
 @Module({
@@ -66,7 +68,9 @@ import { LimitsModel } from './accounts/models/limits.model';
           Profile,
           Name,
           Residence,
-          Application,
+          ApplicationModel,
+          ApplicationDocumentsModel,
+          ApplicationFormModel,
           AccountModel,
           ClearingPeriodsModel,
           DepositProductModel,

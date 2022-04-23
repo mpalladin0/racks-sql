@@ -14,25 +14,29 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ApplicationsService = void 0;
 const common_1 = require("@nestjs/common");
-const event_emitter_1 = require("@nestjs/event-emitter");
 const sequelize_1 = require("@nestjs/sequelize");
 const unit_node_sdk_1 = require("@unit-finance/unit-node-sdk");
 const name_model_1 = require("../profile/models/name.model");
 const profile_model_1 = require("../profile/models/profile.model");
 const user_model_1 = require("../user/models/user.model");
-const ApplicationRefreshStatus_event_1 = require("./event/ApplicationRefreshStatus.event");
-const application_model_1 = require("./models/application.model");
+const application_form_model_1 = require("./forms/application-form.model");
+const application_model_1 = require("./application.model");
+const application_documents_model_1 = require("./documents/application-documents.model");
+const residence_model_1 = require("../profile/models/residence.model");
 const UNIT_TOKEN = 'v2.public.eyJyb2xlIjoiYWRtaW4iLCJ1c2VySWQiOiIxNzE1Iiwic3ViIjoicGxhbnRfc2xhY2tlcjBuQGljbG91ZC5jb20iLCJleHAiOiIyMDIzLTA0LTE0VDE2OjMxOjIzLjYyOVoiLCJqdGkiOiIxMzUwOTgiLCJvcmdJZCI6Ijk5NSIsInNjb3BlIjoiYXBwbGljYXRpb25zIGFwcGxpY2F0aW9ucy13cml0ZSBjdXN0b21lcnMgY3VzdG9tZXJzLXdyaXRlIGN1c3RvbWVyLXRhZ3Mtd3JpdGUgY3VzdG9tZXItdG9rZW4td3JpdGUgYWNjb3VudHMgYWNjb3VudHMtd3JpdGUgY2FyZHMgY2FyZHMtd3JpdGUgY2FyZHMtc2Vuc2l0aXZlIGNhcmRzLXNlbnNpdGl2ZS13cml0ZSB0cmFuc2FjdGlvbnMgdHJhbnNhY3Rpb25zLXdyaXRlIGF1dGhvcml6YXRpb25zIHN0YXRlbWVudHMgcGF5bWVudHMgcGF5bWVudHMtd3JpdGUgcGF5bWVudHMtd3JpdGUtY291bnRlcnBhcnR5IHBheW1lbnRzLXdyaXRlLWFjaC1kZWJpdCBjb3VudGVycGFydGllcyBjb3VudGVycGFydGllcy13cml0ZSBiYXRjaC1yZWxlYXNlcyBiYXRjaC1yZWxlYXNlcy13cml0ZSB3ZWJob29rcyB3ZWJob29rcy13cml0ZSBldmVudHMgZXZlbnRzLXdyaXRlIGF1dGhvcml6YXRpb24tcmVxdWVzdHMgYXV0aG9yaXphdGlvbi1yZXF1ZXN0cy13cml0ZSBjaGVjay1kZXBvc2l0cyBjaGVjay1kZXBvc2l0cy13cml0ZSByZWNlaXZlZC1wYXltZW50cyByZWNlaXZlZC1wYXltZW50cy13cml0ZSBkaXNwdXRlcyBjaGFyZ2ViYWNrcyBjaGFyZ2ViYWNrcy13cml0ZSByZXdhcmRzIHJld2FyZHMtd3JpdGUiLCJvcmciOiJCb29tIiwic291cmNlSXAiOiIiLCJ1c2VyVHlwZSI6Im9yZyIsImlzVW5pdFBpbG90IjpmYWxzZX17wiw8WXgy-cwxzerOBxjD6jZDJv6YLCQK36uXEfT5vrxDOsXnBQo15Al_hvg9yL5qTY-CVbltsh_d125-A4cD';
 const UNIT_API_URL = 'https://api.s.unit.sh/';
 let ApplicationsService = class ApplicationsService {
-    constructor(userModel, profileModel, applicationModel) {
+    constructor(logger, userModel, profileModel, applicationModel, applicationDocumentsModel, applicationFormModel) {
+        this.logger = logger;
         this.userModel = userModel;
         this.profileModel = profileModel;
         this.applicationModel = applicationModel;
+        this.applicationDocumentsModel = applicationDocumentsModel;
+        this.applicationFormModel = applicationFormModel;
         this.unit = new unit_node_sdk_1.Unit(UNIT_TOKEN, UNIT_API_URL);
     }
-    async createApplication(createApplicationDto) {
-        const { user_uuid } = createApplicationDto;
+    async createApplication(createApplicationFormDto) {
+        const { user_uuid } = createApplicationFormDto;
         try {
             const Profile = await this.profileModel.findOne({ where: { user_uuid: user_uuid } });
             if (Profile === null) {
@@ -51,24 +55,36 @@ let ApplicationsService = class ApplicationsService {
                 include: [
                     {
                         model: profile_model_1.Profile,
-                        include: [name_model_1.Name]
+                        include: [
+                            { model: name_model_1.Name },
+                            { model: residence_model_1.Residence }
+                        ]
                     }
                 ]
             });
-            const { data: { type, attributes, id } } = await this.createUnitApplication(user_uuid, User.profile[0].name[0].first, User.profile[0].name[0].middle, User.profile[0].name[0].last);
+            this.logger.warn(User.toJSON());
+            const { data: { type, attributes, id } } = await this.createUnitApplicationForm(user_uuid, User.profile[0].name[0].first, User.profile[0].name[0].middle, User.profile[0].name[0].last);
+            this.logger.warn(type, attributes, id);
             const Application = await this.applicationModel.create({
-                url: attributes.url,
-                unit_id: id
+                user_uuid: user_uuid,
+                form: [{
+                        url: attributes.url,
+                        id: id,
+                    }]
+            }, {
+                include: [
+                    { model: application_form_model_1.ApplicationFormModel },
+                    { model: application_documents_model_1.ApplicationDocumentsModel }
+                ]
             });
-            await User.$add('applications', Application);
-            await User.save();
+            this.logger.warn(Application);
             return Application;
         }
         catch (err) {
             return err;
         }
     }
-    async createUnitApplication(user_uuid, first_name, middle_name, last_name) {
+    async createUnitApplicationForm(user_uuid, first_name, middle_name, last_name) {
         const applicationFormRequest = {
             type: 'applicationForm',
             attributes: {
@@ -94,28 +110,63 @@ let ApplicationsService = class ApplicationsService {
             return err;
         }
     }
-    async findAllApplicationsByUserUUID(user_uuid) {
-        return await this.applicationModel.findAll({
+    async findAllApplicationFormsByUserUUID(user_uuid) {
+        return await this.applicationFormModel.findAll({
             where: {
                 user_uuid: user_uuid
             }
         });
     }
-    async findOneByApplicationUUID(application_uuid) {
+    async findOne_by_ApplicationFormUUID(application_form_uuid) {
         try {
-            const application = await this.applicationModel.findOne({
-                where: {
-                    application_uuid
-                }
+            const ApplicationForm = await this.applicationFormModel.findOne({
+                where: { application_form_uuid: application_form_uuid }
             });
-            if (application)
-                return application;
+            if (ApplicationForm)
+                return ApplicationForm;
             else
-                return `Application ${application_uuid} could not be found.`;
+                throw new common_1.HttpException({
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    error: `Application Form ${application_form_uuid} not found.`,
+                }, common_1.HttpStatus.NOT_FOUND);
         }
         catch (err) {
             return err;
         }
+    }
+    async findOne_by_ApplicationUUID(application_uuid) {
+        try {
+            const Application = await this.applicationModel.findOne({
+                where: {
+                    application_uuid: application_uuid
+                }
+            });
+            if (Application)
+                return Application;
+            else
+                throw new common_1.HttpException({
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    error: `Application ${application_uuid} not found.`,
+                }, common_1.HttpStatus.NOT_FOUND);
+        }
+        catch (err) {
+            return err;
+        }
+    }
+    async findAll_Applications_by_UserUUID(user_uuid) {
+        const Applications = await this.applicationModel.findAll({
+            where: { user_uuid: user_uuid },
+            include: [
+                { model: application_form_model_1.ApplicationFormModel },
+                { model: application_documents_model_1.ApplicationDocumentsModel }
+            ]
+        });
+        if (Applications.length == 0)
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.NOT_FOUND,
+                error: `User ${user_uuid} has no applications.`
+            }, common_1.HttpStatus.NOT_FOUND);
+        return Applications;
     }
     async setUnitIDForUser(user_uuid) {
         const user = await this.userModel.findOne({ where: { uuid: user_uuid } });
@@ -129,42 +180,15 @@ let ApplicationsService = class ApplicationsService {
             return err;
         }
     }
-    async refreshApplicationStatus(event) {
-        const Applications = await this.applicationModel.findAll({ where: { user_uuid: event.user_uuid } });
-        Applications.forEach(async (application_form) => {
-            const { status } = application_form;
-            switch (status) {
-                case 'pending':
-                    console.log(application_form.unit_id);
-                    const { data } = await this.unit.applicationForms.get(application_form.unit_id);
-                    console.log(data.attributes.stage);
-                    break;
-                case 'pending_review':
-                    break;
-                case 'approved':
-                    break;
-                case 'denied':
-                    break;
-                case 'awaiting_documents':
-                    break;
-                default:
-                    return new Error(`Unknown status ${status}`);
-            }
-        });
-    }
 };
-__decorate([
-    (0, event_emitter_1.OnEvent)('applications.status.refresh'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [ApplicationRefreshStatus_event_1.ApplicationRefreshStatusEvent]),
-    __metadata("design:returntype", Promise)
-], ApplicationsService.prototype, "refreshApplicationStatus", null);
 ApplicationsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, sequelize_1.InjectModel)(user_model_1.User)),
-    __param(1, (0, sequelize_1.InjectModel)(profile_model_1.Profile)),
-    __param(2, (0, sequelize_1.InjectModel)(application_model_1.Application)),
-    __metadata("design:paramtypes", [Object, Object, Object])
+    __param(1, (0, sequelize_1.InjectModel)(user_model_1.User)),
+    __param(2, (0, sequelize_1.InjectModel)(profile_model_1.Profile)),
+    __param(3, (0, sequelize_1.InjectModel)(application_model_1.ApplicationModel)),
+    __param(4, (0, sequelize_1.InjectModel)(application_documents_model_1.ApplicationDocumentsModel)),
+    __param(5, (0, sequelize_1.InjectModel)(application_form_model_1.ApplicationFormModel)),
+    __metadata("design:paramtypes", [common_1.Logger, Object, Object, Object, Object, Object])
 ], ApplicationsService);
 exports.ApplicationsService = ApplicationsService;
 //# sourceMappingURL=applications.service.js.map

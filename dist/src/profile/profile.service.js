@@ -30,10 +30,16 @@ let ProfileService = class ProfileService {
     }
     async findOneByUserUUID(user_uuid) {
         try {
-            return await this.profileModel.findOne({ where: { user_uuid }, include: [
+            const Profile = await this.profileModel.findOne({ where: { user_uuid }, include: [
                     { model: name_model_1.Name },
                     { model: residence_model_1.Residence }
                 ] });
+            if (Profile === null)
+                return new common_1.HttpException({
+                    error: common_1.HttpStatus.NOT_FOUND,
+                    status: `User ${user_uuid} does not have a profile.`,
+                }, common_1.HttpStatus.NOT_FOUND);
+            return Profile;
         }
         catch (err) {
             return err.message;
@@ -41,10 +47,16 @@ let ProfileService = class ProfileService {
     }
     async findAllByUserUUID(user_uuid) {
         try {
-            return await this.profileModel.findAll({ where: { user_uuid }, include: [
+            const Profiles = await this.profileModel.findAll({ where: { user_uuid }, include: [
                     { model: name_model_1.Name },
                     { model: residence_model_1.Residence }
                 ] });
+            if (Profiles.length == 0)
+                return new common_1.HttpException({
+                    error: common_1.HttpStatus.NOT_FOUND,
+                    status: `User ${user_uuid} does not have a profile.`,
+                }, common_1.HttpStatus.NOT_FOUND);
+            return Profiles;
         }
         catch (err) {
             return err.message;

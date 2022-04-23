@@ -23,12 +23,14 @@ const user_model_1 = require("./user/models/user.model");
 const profile_model_1 = require("./profile/models/profile.model");
 const name_model_1 = require("./profile/models/name.model");
 const residence_model_1 = require("./profile/models/residence.model");
-const application_model_1 = require("./applications/models/application.model");
+const application_form_model_1 = require("./applications/forms/application-form.model");
 const account_model_1 = require("./accounts/models/account.model");
 const clearing_periods_model_1 = require("./accounts/models/clearing_periods.model");
 const deposit_product_model_1 = require("./accounts/models/deposit_product.model");
 const fees_model_1 = require("./accounts/models/fees.model");
 const limits_model_1 = require("./accounts/models/limits.model");
+const application_model_1 = require("./applications/application.model");
+const application_documents_model_1 = require("./applications/documents/application-documents.model");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -65,7 +67,9 @@ AppModule = __decorate([
                         profile_model_1.Profile,
                         name_model_1.Name,
                         residence_model_1.Residence,
-                        application_model_1.Application,
+                        application_model_1.ApplicationModel,
+                        application_documents_model_1.ApplicationDocumentsModel,
+                        application_form_model_1.ApplicationFormModel,
                         account_model_1.AccountModel,
                         clearing_periods_model_1.ClearingPeriodsModel,
                         deposit_product_model_1.DepositProductModel,

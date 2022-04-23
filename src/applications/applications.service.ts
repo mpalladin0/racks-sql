@@ -6,10 +6,13 @@ import { UserAuthenticatedEvent } from 'src/auth/user-authenticated.event';
 import { Name } from 'src/profile/models/name.model';
 import { Profile } from 'src/profile/models/profile.model';
 import { User } from 'src/user/models/user.model';
-import { CreateApplicationDto } from './dto/create-application.dto';
-import { UpdateApplicationDto } from './dto/update-application.dto';
-import { ApplicationRefreshStatusEvent } from './event/ApplicationRefreshStatus.event';
-import { Application } from './models/application.model';
+import { CreateApplicationFormDto } from './forms/dto/create-application-form.dto';
+import { UpdateApplicationDto } from './forms/dto/update-application-form.dto';
+import { ApplicationRefreshStatusEvent } from './forms/event/ApplicationRefreshStatus.event';
+import { ApplicationFormModel } from './forms/application-form.model';
+import { ApplicationModel } from './application.model';
+import { ApplicationDocumentsModel } from './documents/application-documents.model';
+import { Residence } from 'src/profile/models/residence.model';
 
 const UNIT_TOKEN = 'v2.public.eyJyb2xlIjoiYWRtaW4iLCJ1c2VySWQiOiIxNzE1Iiwic3ViIjoicGxhbnRfc2xhY2tlcjBuQGljbG91ZC5jb20iLCJleHAiOiIyMDIzLTA0LTE0VDE2OjMxOjIzLjYyOVoiLCJqdGkiOiIxMzUwOTgiLCJvcmdJZCI6Ijk5NSIsInNjb3BlIjoiYXBwbGljYXRpb25zIGFwcGxpY2F0aW9ucy13cml0ZSBjdXN0b21lcnMgY3VzdG9tZXJzLXdyaXRlIGN1c3RvbWVyLXRhZ3Mtd3JpdGUgY3VzdG9tZXItdG9rZW4td3JpdGUgYWNjb3VudHMgYWNjb3VudHMtd3JpdGUgY2FyZHMgY2FyZHMtd3JpdGUgY2FyZHMtc2Vuc2l0aXZlIGNhcmRzLXNlbnNpdGl2ZS13cml0ZSB0cmFuc2FjdGlvbnMgdHJhbnNhY3Rpb25zLXdyaXRlIGF1dGhvcml6YXRpb25zIHN0YXRlbWVudHMgcGF5bWVudHMgcGF5bWVudHMtd3JpdGUgcGF5bWVudHMtd3JpdGUtY291bnRlcnBhcnR5IHBheW1lbnRzLXdyaXRlLWFjaC1kZWJpdCBjb3VudGVycGFydGllcyBjb3VudGVycGFydGllcy13cml0ZSBiYXRjaC1yZWxlYXNlcyBiYXRjaC1yZWxlYXNlcy13cml0ZSB3ZWJob29rcyB3ZWJob29rcy13cml0ZSBldmVudHMgZXZlbnRzLXdyaXRlIGF1dGhvcml6YXRpb24tcmVxdWVzdHMgYXV0aG9yaXphdGlvbi1yZXF1ZXN0cy13cml0ZSBjaGVjay1kZXBvc2l0cyBjaGVjay1kZXBvc2l0cy13cml0ZSByZWNlaXZlZC1wYXltZW50cyByZWNlaXZlZC1wYXltZW50cy13cml0ZSBkaXNwdXRlcyBjaGFyZ2ViYWNrcyBjaGFyZ2ViYWNrcy13cml0ZSByZXdhcmRzIHJld2FyZHMtd3JpdGUiLCJvcmciOiJCb29tIiwic291cmNlSXAiOiIiLCJ1c2VyVHlwZSI6Im9yZyIsImlzVW5pdFBpbG90IjpmYWxzZX17wiw8WXgy-cwxzerOBxjD6jZDJv6YLCQK36uXEfT5vrxDOsXnBQo15Al_hvg9yL5qTY-CVbltsh_d125-A4cD'
 const UNIT_API_URL = 'https://api.s.unit.sh/'
@@ -19,13 +22,22 @@ export class ApplicationsService {
   unit = new Unit(UNIT_TOKEN, UNIT_API_URL)
 
   constructor(
+    private readonly logger: Logger,
     @InjectModel(User) private readonly userModel: typeof User,
     @InjectModel(Profile) private readonly profileModel: typeof Profile,
-    @InjectModel(Application) private readonly applicationModel: typeof Application,
+    @InjectModel(ApplicationModel) private readonly applicationModel: typeof ApplicationModel,
+    @InjectModel(ApplicationDocumentsModel) private readonly applicationDocumentsModel: typeof ApplicationDocumentsModel,
+    @InjectModel(ApplicationFormModel) private readonly applicationFormModel: typeof ApplicationFormModel,
   ) {}
 
-  async createApplication(createApplicationDto: CreateApplicationDto) {
-    const { user_uuid } = createApplicationDto;
+
+  async createApplication(createApplicationFormDto: CreateApplicationFormDto) {
+    const { user_uuid } = createApplicationFormDto;
+
+    /**
+     * Ensure user has a @Profile before creating new @Applicaton
+     * If not, throw a new error
+     */
     try {
       const Profile = await this.profileModel.findOne({ where: { user_uuid: user_uuid }});
       if (Profile === null) {
@@ -38,18 +50,21 @@ export class ApplicationsService {
       return err;
     }
 
-
     try {
       const User = await this.userModel.findOne({
         where: { uuid: user_uuid },
         include: [
-          {
+          { 
             model: Profile,
-            include: [Name]
+            include: [
+              { model: Name },
+              { model: Residence }
+            ]
           }
         ]
       })
 
+      this.logger.warn(User.toJSON());
 
       const {
         data: {
@@ -57,27 +72,89 @@ export class ApplicationsService {
           attributes,
           id
         }
-      }: UnitResponse<CreateApplicationFormResponse> = await this.createUnitApplication(user_uuid, User.profile[0].name[0].first, User.profile[0].name[0].middle, User.profile[0].name[0].last)
+      }: UnitResponse<CreateApplicationFormResponse> = await this.createUnitApplicationForm(user_uuid, User.profile[0].name[0].first, User.profile[0].name[0].middle, User.profile[0].name[0].last)
 
-      const Application = await this.applicationModel.create({
-        url: attributes.url,
-        unit_id: id
+      this.logger.warn(type, attributes, id);
+
+      const Application = await this.applicationModel.create(
+        {
+          user_uuid: user_uuid,
+          form: [{
+            url: attributes.url,
+            id: id,
+          }]    
+        }, {
+        include: [
+          { model: ApplicationFormModel },
+          { model: ApplicationDocumentsModel }
+        ]
       })
 
-      await User.$add('applications', Application)
-      await User.save();
+      this.logger.warn(Application);
+
       return Application;
 
-    } catch (err) { 
-      return err 
+
+    } catch (err) {
+      return err;
     }
+
+
   }
+
+  // async createApplicationForm(createApplicationFormDto: CreateApplicationFormDto) {
+  //   const { user_uuid } = createApplicationFormDto;
+  //   try {
+  //     const Profile = await this.profileModel.findOne({ where: { user_uuid: user_uuid }});
+  //     if (Profile === null) {
+  //       throw new HttpException({
+  //         status: HttpStatus.NOT_FOUND,
+  //         error: 'User profile must be created before creating an application',
+  //       }, HttpStatus.NOT_FOUND);
+  //     }
+  //   } catch (err) {
+  //     return err;
+  //   }
+
+  //   try {
+  //     const User = await this.userModel.findOne({
+  //       where: { uuid: user_uuid },
+  //       include: [
+  //         {
+  //           model: Profile,
+  //           include: [Name]
+  //         }
+  //       ]
+  //     })
+
+
+  //     const {
+  //       data: {
+  //         type,
+  //         attributes,
+  //         id
+  //       }
+  //     }: UnitResponse<CreateApplicationFormResponse> = await this.createUnitApplicationForm(user_uuid, User.profile[0].name[0].first, User.profile[0].name[0].middle, User.profile[0].name[0].last)
+
+  //     const ApplicationForm = await this.applicationFormModel.create({
+  //       url: attributes.url,
+  //       unit_id: id
+  //     })
+
+  //     await User.$add('application_forms', ApplicationForm)
+  //     await User.save();
+  //     return ApplicationForm;
+
+  //   } catch (err) { 
+  //     return err 
+  //   }
+  // }
 
   /**
    * 
    * @param user_uuid 
    */
-  async createUnitApplication(user_uuid: string, first_name: string, middle_name: string, last_name: string) {
+  async createUnitApplicationForm(user_uuid: string, first_name: string, middle_name: string, last_name: string) {
       const applicationFormRequest: CreateApplicationFormRequest = {
         type: 'applicationForm',
         attributes: {
@@ -107,27 +184,63 @@ export class ApplicationsService {
    * @param user_uuid 
    * @returns all applications for a given user_uuid
    */
-  async findAllApplicationsByUserUUID(user_uuid: string) {
-    return await this.applicationModel.findAll({
+  async findAllApplicationFormsByUserUUID(user_uuid: string) {
+    return await this.applicationFormModel.findAll({
       where: {
         user_uuid: user_uuid
       }
     })
   }
 
-  async findOneByApplicationUUID(application_uuid: string) {
+  async findOne_by_ApplicationFormUUID(application_form_uuid: string) {
     try {
-      const application = await this.applicationModel.findOne({
-        where: {
-          application_uuid
-        }
+      const ApplicationForm = await this.applicationFormModel.findOne({
+        where: { application_form_uuid: application_form_uuid }
       })
 
-      if (application) return application
-      else return `Application ${application_uuid} could not be found.`
+      if (ApplicationForm) return ApplicationForm
+      else throw new HttpException({
+        status: HttpStatus.NOT_FOUND,
+        error: `Application Form ${application_form_uuid} not found.`,
+      }, HttpStatus.NOT_FOUND)
     } catch (err) {
       return err
     }
+  }
+
+  async findOne_by_ApplicationUUID(application_uuid: string) {
+    try {
+      const Application = await this.applicationModel.findOne({
+        where: {
+          application_uuid: application_uuid
+        }
+      })
+
+      if (Application) return Application
+      else throw new HttpException({
+        status: HttpStatus.NOT_FOUND,
+        error: `Application ${application_uuid} not found.`,
+      }, HttpStatus.NOT_FOUND)
+    } catch (err) {
+      return err
+    }
+  }
+
+  async findAll_Applications_by_UserUUID (user_uuid: string) {
+    const Applications = await this.applicationModel.findAll({
+      where: { user_uuid: user_uuid },
+      include: [
+        { model: ApplicationFormModel },
+        { model: ApplicationDocumentsModel }
+      ]
+    })
+
+    if (Applications.length == 0) throw new HttpException({
+      status: HttpStatus.NOT_FOUND,
+      error: `User ${user_uuid} has no applications.`
+    }, HttpStatus.NOT_FOUND) 
+
+    return Applications;
   }
 
   async setUnitIDForUser(user_uuid: string) {
@@ -142,47 +255,47 @@ export class ApplicationsService {
     } catch (err) { return err }
   }
 
-  @OnEvent('applications.status.refresh')
-  async refreshApplicationStatus(event: ApplicationRefreshStatusEvent) {
-    const Applications = await this.applicationModel.findAll({ where: { user_uuid: event.user_uuid }})
+  // @OnEvent('applications.status.refresh')
+  // async refreshApplicationStatus(event: ApplicationRefreshStatusEvent) {
+  //   const Applications = await this.applicationFormModel.findAll({ where: { user_uuid: event.user_uuid }})
 
-    // pending = 'pending',
-    // pending_review = 'pending_review',
-    // approved = 'approved',
-    // denied = 'denied',
-    // awaiting_documents = 'awaiting_documents'
-
-
-    Applications.forEach(async application_form => {
-      const { status } = application_form;
-
-      switch (status) {
-        case 'pending': 
-          console.log(application_form.unit_id);
+  //   // pending = 'pending',
+  //   // pending_review = 'pending_review',
+  //   // approved = 'approved',
+  //   // denied = 'denied',
+  //   // awaiting_documents = 'awaiting_documents'
 
 
-          const { data } = await this.unit.applicationForms.get(application_form.unit_id)
-          console.log(data.attributes.stage)
+  //   Applications.forEach(async application_form => {
+  //     const { status } = application_form;
 
-        break;
-        case 'pending_review': 
+  //     switch (status) {
+  //       case 'pending': 
+  //         console.log(application_form.unit_id);
 
 
-        break;
-        case 'approved':
+  //         const { data } = await this.unit.applicationForms.get(application_form.unit_id)
+  //         console.log(data.attributes.stage)
 
-        break;
-        case 'denied':
+  //       break;
+  //       case 'pending_review': 
 
-        break;
 
-        case 'awaiting_documents':
+  //       break;
+  //       case 'approved':
 
-        break;
-        default:
-          return new Error(`Unknown status ${status}`)
-      }
-    })
-  }
+  //       break;
+  //       case 'denied':
+
+  //       break;
+
+  //       case 'awaiting_documents':
+
+  //       break;
+  //       default:
+  //         return new Error(`Unknown status ${status}`)
+  //     }
+  //   })
+  // }
 
 }

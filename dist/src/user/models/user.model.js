@@ -14,7 +14,7 @@ const sequelize_1 = require("sequelize");
 const sequelize_2 = require("sequelize");
 const sequelize_typescript_1 = require("sequelize-typescript");
 const account_model_1 = require("../../accounts/models/account.model");
-const application_model_1 = require("../../applications/models/application.model");
+const application_model_1 = require("../../applications/application.model");
 const profile_model_1 = require("../../profile/models/profile.model");
 let User = class User extends sequelize_typescript_1.Model {
 };
@@ -39,7 +39,7 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "profile", void 0);
 __decorate([
-    (0, sequelize_typescript_1.HasMany)(() => application_model_1.Application),
+    (0, sequelize_typescript_1.HasMany)(() => application_model_1.ApplicationModel),
     __metadata("design:type", Array)
 ], User.prototype, "applications", void 0);
 __decorate([

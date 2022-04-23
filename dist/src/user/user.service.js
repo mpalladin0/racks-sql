@@ -19,7 +19,6 @@ const user_model_1 = require("./models/user.model");
 const bcrypt = require("bcrypt");
 const profile_model_1 = require("../profile/models/profile.model");
 const name_model_1 = require("../profile/models/name.model");
-const application_model_1 = require("../applications/models/application.model");
 const residence_model_1 = require("../profile/models/residence.model");
 const account_model_1 = require("../accounts/models/account.model");
 const limits_model_1 = require("../accounts/models/limits.model");
@@ -27,6 +26,9 @@ const clearing_periods_model_1 = require("../accounts/models/clearing_periods.mo
 const fees_model_1 = require("../accounts/models/fees.model");
 const deposit_product_model_1 = require("../accounts/models/deposit_product.model");
 const limits_durations_model_1 = require("../accounts/models/limits.durations.model");
+const application_model_1 = require("../applications/application.model");
+const application_form_model_1 = require("../applications/forms/application-form.model");
+const application_documents_model_1 = require("../applications/documents/application-documents.model");
 let UserService = class UserService {
     constructor(userModel) {
         this.userModel = userModel;
@@ -68,7 +70,11 @@ let UserService = class UserService {
                         ]
                     },
                     {
-                        model: application_model_1.Application
+                        model: application_model_1.ApplicationModel,
+                        include: [
+                            { model: application_form_model_1.ApplicationFormModel },
+                            { model: application_documents_model_1.ApplicationDocumentsModel }
+                        ]
                     },
                     {
                         model: account_model_1.AccountModel,
@@ -106,7 +112,7 @@ let UserService = class UserService {
                 },
                 include: [
                     {
-                        model: application_model_1.Application
+                        model: application_model_1.ApplicationModel
                     }
                 ]
             });
