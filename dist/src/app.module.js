@@ -40,12 +40,12 @@ AppModule = __decorate([
             sequelize_1.SequelizeModule.forRoot({
                 synchronize: true,
                 autoLoadModels: true,
-                logging: false,
+                logging: true,
                 dialect: secrets_constants_1.DB_DIALECT,
-                host: secrets_constants_1.DB_HOST,
-                database: secrets_constants_1.DB_DATABASE,
-                username: secrets_constants_1.DB_USERNAME,
-                password: secrets_constants_1.DB_PASSWORD,
+                host: secrets_constants_1.DB_HOST || secrets_constants_1.DB_HOST,
+                database: process.env.DATABASE_DATABASE || secrets_constants_1.DB_DATABASE,
+                username: process.env.DATABASE_USERNAME || secrets_constants_1.DB_USERNAME,
+                password: process.env.DATABASE_DATABASE || secrets_constants_1.DB_PASSWORD,
                 port: secrets_constants_1.DB_PORT,
                 ssl: true,
                 dialectOptions: {

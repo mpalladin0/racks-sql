@@ -14,17 +14,19 @@ const sequelize_1 = require("@nestjs/sequelize");
 const application_model_1 = require("./models/application.model");
 const user_module_1 = require("../user/user.module");
 const axios_1 = require("@nestjs/axios");
+const profile_module_1 = require("../profile/profile.module");
 let ApplicationsModule = class ApplicationsModule {
 };
 ApplicationsModule = __decorate([
     (0, common_1.Module)({
         imports: [
             axios_1.HttpModule,
+            profile_module_1.ProfileModule,
             user_module_1.UserModule,
             sequelize_1.SequelizeModule.forFeature([application_model_1.Application])
         ],
         controllers: [applications_controller_1.ApplicationsController],
-        providers: [applications_service_1.ApplicationsService],
+        providers: [applications_service_1.ApplicationsService, common_1.Logger],
         exports: [sequelize_1.SequelizeModule]
     })
 ], ApplicationsModule);

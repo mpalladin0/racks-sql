@@ -20,7 +20,7 @@ UserModule = __decorate([
             sequelize_1.SequelizeModule.forFeature([user_model_1.User]),
         ],
         controllers: [user_controller_1.UserController],
-        providers: [user_service_1.UserService],
+        providers: [user_service_1.UserService, common_1.Logger],
         exports: [sequelize_1.SequelizeModule, user_service_1.UserService]
     })
 ], UserModule);

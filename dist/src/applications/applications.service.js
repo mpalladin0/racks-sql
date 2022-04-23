@@ -25,29 +25,44 @@ const application_model_1 = require("./models/application.model");
 const UNIT_TOKEN = 'v2.public.eyJyb2xlIjoiYWRtaW4iLCJ1c2VySWQiOiIxNzE1Iiwic3ViIjoicGxhbnRfc2xhY2tlcjBuQGljbG91ZC5jb20iLCJleHAiOiIyMDIzLTA0LTE0VDE2OjMxOjIzLjYyOVoiLCJqdGkiOiIxMzUwOTgiLCJvcmdJZCI6Ijk5NSIsInNjb3BlIjoiYXBwbGljYXRpb25zIGFwcGxpY2F0aW9ucy13cml0ZSBjdXN0b21lcnMgY3VzdG9tZXJzLXdyaXRlIGN1c3RvbWVyLXRhZ3Mtd3JpdGUgY3VzdG9tZXItdG9rZW4td3JpdGUgYWNjb3VudHMgYWNjb3VudHMtd3JpdGUgY2FyZHMgY2FyZHMtd3JpdGUgY2FyZHMtc2Vuc2l0aXZlIGNhcmRzLXNlbnNpdGl2ZS13cml0ZSB0cmFuc2FjdGlvbnMgdHJhbnNhY3Rpb25zLXdyaXRlIGF1dGhvcml6YXRpb25zIHN0YXRlbWVudHMgcGF5bWVudHMgcGF5bWVudHMtd3JpdGUgcGF5bWVudHMtd3JpdGUtY291bnRlcnBhcnR5IHBheW1lbnRzLXdyaXRlLWFjaC1kZWJpdCBjb3VudGVycGFydGllcyBjb3VudGVycGFydGllcy13cml0ZSBiYXRjaC1yZWxlYXNlcyBiYXRjaC1yZWxlYXNlcy13cml0ZSB3ZWJob29rcyB3ZWJob29rcy13cml0ZSBldmVudHMgZXZlbnRzLXdyaXRlIGF1dGhvcml6YXRpb24tcmVxdWVzdHMgYXV0aG9yaXphdGlvbi1yZXF1ZXN0cy13cml0ZSBjaGVjay1kZXBvc2l0cyBjaGVjay1kZXBvc2l0cy13cml0ZSByZWNlaXZlZC1wYXltZW50cyByZWNlaXZlZC1wYXltZW50cy13cml0ZSBkaXNwdXRlcyBjaGFyZ2ViYWNrcyBjaGFyZ2ViYWNrcy13cml0ZSByZXdhcmRzIHJld2FyZHMtd3JpdGUiLCJvcmciOiJCb29tIiwic291cmNlSXAiOiIiLCJ1c2VyVHlwZSI6Im9yZyIsImlzVW5pdFBpbG90IjpmYWxzZX17wiw8WXgy-cwxzerOBxjD6jZDJv6YLCQK36uXEfT5vrxDOsXnBQo15Al_hvg9yL5qTY-CVbltsh_d125-A4cD';
 const UNIT_API_URL = 'https://api.s.unit.sh/';
 let ApplicationsService = class ApplicationsService {
-    constructor(userModel, applicationModel) {
+    constructor(userModel, profileModel, applicationModel) {
         this.userModel = userModel;
+        this.profileModel = profileModel;
         this.applicationModel = applicationModel;
         this.unit = new unit_node_sdk_1.Unit(UNIT_TOKEN, UNIT_API_URL);
     }
     async createApplication(createApplicationDto) {
         const { user_uuid } = createApplicationDto;
         try {
-            console.log('Creating application');
-            const user = await this.userModel.findOne({ where: { uuid: user_uuid }, include: [
+            const Profile = await this.profileModel.findOne({ where: { user_uuid: user_uuid } });
+            if (Profile === null) {
+                throw new common_1.HttpException({
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    error: 'User profile must be created before creating an application',
+                }, common_1.HttpStatus.NOT_FOUND);
+            }
+        }
+        catch (err) {
+            return err;
+        }
+        try {
+            const User = await this.userModel.findOne({
+                where: { uuid: user_uuid },
+                include: [
                     {
                         model: profile_model_1.Profile,
                         include: [name_model_1.Name]
                     }
-                ] });
-            const { data: { type, attributes, id } } = await this.createUnitApplication(user_uuid, user.profile[0].name[0].first, user.profile[0].name[0].middle, user.profile[0].name[0].last);
-            const application = await this.applicationModel.create({
+                ]
+            });
+            const { data: { type, attributes, id } } = await this.createUnitApplication(user_uuid, User.profile[0].name[0].first, User.profile[0].name[0].middle, User.profile[0].name[0].last);
+            const Application = await this.applicationModel.create({
                 url: attributes.url,
                 unit_id: id
             });
-            await user.$add('applications', application);
-            await user.save();
-            return application;
+            await User.$add('applications', Application);
+            await User.save();
+            return Application;
         }
         catch (err) {
             return err;
@@ -147,8 +162,9 @@ __decorate([
 ApplicationsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, sequelize_1.InjectModel)(user_model_1.User)),
-    __param(1, (0, sequelize_1.InjectModel)(application_model_1.Application)),
-    __metadata("design:paramtypes", [Object, Object])
+    __param(1, (0, sequelize_1.InjectModel)(profile_model_1.Profile)),
+    __param(2, (0, sequelize_1.InjectModel)(application_model_1.Application)),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], ApplicationsService);
 exports.ApplicationsService = ApplicationsService;
 //# sourceMappingURL=applications.service.js.map

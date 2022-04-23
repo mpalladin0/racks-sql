@@ -1,4 +1,4 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { HttpException, HttpService, HttpStatus, Inject, Injectable, Logger, LoggerService } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateApplicationFormRequest, CreateApplicationFormResponse, Unit, UnitResponse } from '@unit-finance/unit-node-sdk';
@@ -20,21 +20,36 @@ export class ApplicationsService {
 
   constructor(
     @InjectModel(User) private readonly userModel: typeof User,
+    @InjectModel(Profile) private readonly profileModel: typeof Profile,
     @InjectModel(Application) private readonly applicationModel: typeof Application,
   ) {}
 
   async createApplication(createApplicationDto: CreateApplicationDto) {
     const { user_uuid } = createApplicationDto;
+    try {
+      const Profile = await this.profileModel.findOne({ where: { user_uuid: user_uuid }});
+      if (Profile === null) {
+        throw new HttpException({
+          status: HttpStatus.NOT_FOUND,
+          error: 'User profile must be created before creating an application',
+        }, HttpStatus.NOT_FOUND);
+      }
+    } catch (err) {
+      return err;
+    }
+
 
     try {
-      console.log('Creating application')
+      const User = await this.userModel.findOne({
+        where: { uuid: user_uuid },
+        include: [
+          {
+            model: Profile,
+            include: [Name]
+          }
+        ]
+      })
 
-      const user = await this.userModel.findOne({ where: { uuid: user_uuid }, include: [
-        { 
-          model: Profile,
-          include: [Name]
-        }
-      ]});
 
       const {
         data: {
@@ -42,19 +57,20 @@ export class ApplicationsService {
           attributes,
           id
         }
-      }: UnitResponse<CreateApplicationFormResponse> = await this.createUnitApplication(user_uuid, user.profile[0].name[0].first, user.profile[0].name[0].middle, user.profile[0].name[0].last)
+      }: UnitResponse<CreateApplicationFormResponse> = await this.createUnitApplication(user_uuid, User.profile[0].name[0].first, User.profile[0].name[0].middle, User.profile[0].name[0].last)
 
-      const application = await this.applicationModel.create({
+      const Application = await this.applicationModel.create({
         url: attributes.url,
         unit_id: id
       })
 
+      await User.$add('applications', Application)
+      await User.save();
+      return Application;
 
-      await user.$add('applications', application)
-      await user.save();
-      return application;
-
-    } catch (err) { return err }
+    } catch (err) { 
+      return err 
+    }
   }
 
   /**

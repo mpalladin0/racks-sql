@@ -17,7 +17,7 @@ async function bootstrap() {
     adminjs_1.default.registerAdapter({
         Database: sequelize_1.Database, Resource: sequelize_1.Resource
     });
-    await app.listen(3030);
+    await app.listen(process.env.PORT || 3030);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

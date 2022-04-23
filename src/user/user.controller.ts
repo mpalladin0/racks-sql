@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './models/user.model';
 import { isEmpty, Subject } from 'rxjs';
 import _ from 'lodash';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { LocalAuthGuard } from 'src/auth/local-auth.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -17,6 +18,7 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
+  @UseGuards(LocalAuthGuard)
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string): Promise<User> {
     try {
