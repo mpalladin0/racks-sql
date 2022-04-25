@@ -18,7 +18,7 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string): Promise<User> {
     try {

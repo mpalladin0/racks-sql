@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/sequelize';
+import { RacksBank } from 'src/bank/racksbank.service';
 import { User as UserModel } from 'src/user/models/user.model';
 import { CreateProfileDto } from './dto/profile/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -14,6 +15,7 @@ import { Residence as ResidenceModel } from './models/residence.model';
 export class ProfileService {
   constructor(
     private eventEmitter: EventEmitter2,
+    private bank: RacksBank,
     @InjectModel(NameModel) private readonly nameModel: typeof NameModel,
     @InjectModel(ProfileModel) private readonly profileModel: typeof ProfileModel,
     @InjectModel(UserModel) private readonly userModel: typeof UserModel,

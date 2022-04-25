@@ -7,6 +7,8 @@ import { CreateApplicationFormDto } from './forms/dto/create-application-form.dt
 import { UpdateApplicationDto } from './forms/dto/update-application-form.dto';
 import { ApplicationFormModel } from './forms/application-form.model';
 import { ApplicationModel } from './application.model';
+import { CreateApplicationFormSimulationDto } from './forms/dto/create-application-form-simulate.dto';
+import { SimulateApplicationEventDto } from './submitted/dto/simulate-application-event.dto';
 @ApiTags('applications')
 @Controller('applications')
 export class ApplicationsController {
@@ -29,11 +31,31 @@ export class ApplicationsController {
     type: ApplicationModel.name,
   })
   createApplicationForm(@Body() createApplicationForm: CreateApplicationFormDto) {
-
-    this.logger.warn("Creating Application...", createApplicationForm)
-
     return this.applicationsService.createApplication(createApplicationForm);
   }
+
+
+  /**
+   * 
+   * @param user_uuid 
+   * @param simulation_type
+   * @returns An new application link assigned to a given user_uuid to (SSN based on simulation type)
+   */
+   @ApiBody({ type: [CreateApplicationFormDto] })
+   @Post('create/simulate')
+   @ApiCreatedResponse({
+     description: 'The application form has been successfully created.',
+     type: ApplicationModel.name,
+   })
+   createApplication_Simulate(@Body() createApplicationFormSimulation: CreateApplicationFormSimulationDto) {
+     return this.applicationsService.createApplication_Simulate(createApplicationFormSimulation);
+   }
+
+   @Post('simulate')
+   simulateApplicationEvent(@Body() simulateApplicationEveneDto: SimulateApplicationEventDto) {
+     return this.applicationsService.simulate_ApplicationEvent(simulateApplicationEveneDto);
+
+   }
 
   /**
    * 
@@ -50,12 +72,10 @@ export class ApplicationsController {
    * @param user_uuid
    * @returns all application links for a given user_uuid
    */
-  @Get(':user_uuid/all')
-  async findAllForUser(@Param('user_uuid') user_uuid: string) {
-    // await this.applicationsService.setUnitIDForUser(user_uuid);
-
-    return this.applicationsService.findAll_Applications_by_UserUUID(user_uuid);
-  }
+   @Get(':user_uuid/submitted/all')
+   async findAllSubmittedUser(@Param('user_uuid') user_uuid: string) { 
+     return this.applicationsService.findAllSubmitted_by_UserUUID_from_Unit(user_uuid);
+   }
 
   /**
    * To do: Auto-update / remove old applications when their status changes 

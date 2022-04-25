@@ -1,0 +1,44 @@
+{
+    "type": "individualCustomer",
+    "id": "8",
+    "attributes": {
+        "createdAt": "2020-05-12T19:41:04.123Z",
+        "fullName": {
+            "first": "Peter",
+            "last": "Parker"
+        },
+        "ssn": "721074426",
+        "address": {
+            "street": "20 Ingram St",
+            "street2": null,
+            "city": "Forest Hills",
+            "state": "NY",
+            "postalCode": "11375",
+            "country": "US"
+        },
+        "dateOfBirth": "2001-08-10",
+        "email": "peter@oscorp.com",
+        "phone": {
+            "countryCode": "1",
+            "number": "1555555578"
+        },
+        "status": "Active",
+        "tags": {
+            "userId": "106a75e9-de77-4e25-9561-faffe59d7814"
+        }
+    },
+    "relationships": {
+        "org": {
+            "data": {
+                "type": "org",
+                "id": "1"
+            }
+        },
+        "application": {
+            "data": {
+                "type": "individualApplication",
+                "id": "8"
+            }
+        }
+    }
+}

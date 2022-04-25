@@ -8,9 +8,11 @@ import { DepositProductModel } from './models/deposit_product.model';
 import { FeesModel } from './models/fees.model';
 import { LimitsModel } from './models/limits.model';
 import { LimitsDurationModel } from './models/limits.durations.model';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
+    UserModule,
     SequelizeModule.forFeature([
       AccountModel, 
       DepositProductModel,

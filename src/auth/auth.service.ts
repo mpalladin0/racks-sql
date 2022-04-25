@@ -54,7 +54,9 @@ export class AuthService {
         const token = this.jwtService.sign(payload)
         const user_uuid = this.User.uuid;
 
-        this.eventEmitter.emit('user.login.authenticated')
+        // this.eventEmitter.emit('user.login.authenticated')
+
+        await this.getNeeded(user_uuid)
             
         return {
             access_token: token,
@@ -62,19 +64,26 @@ export class AuthService {
         } as UserAuthenticatedJWTPayload
     }
 
-    @OnEvent('user.login.authenticated')
-    async getNeeded() {
-        const unit_id = this.User.unit_id;
-        const unit_applications = this.User.applications
-        const profile = this.User.profile;
+    // @OnEvent('user.login.authenticated')
+    async getNeeded(user_uuid) {
+        const UnitCustomer = await this.unit.customers.list({ tags: {
+            "internal_user_uuid": user_uuid
+        }})
 
-        if (unit_id === null || typeof unit_id === 'undefined') this.eventEmitter.emit('user.needs.unit_id', new UserAuthenticatedEvent('user.needs.unit_id'))
-        if (profile === null || typeof profile === 'undefined') this.eventEmitter.emit('user.needs.profile', new UserAuthenticatedEvent('user.needs.profile'))
-        if (unit_applications === null || unit_applications.length == 0 || typeof unit_applications === 'undefined') this.eventEmitter.emit('user.needs.applications', new UserAuthenticatedEvent('user.needs.applications'))
-        else this.eventEmitter.emit('user.refresh.applications', new UserAuthenticatedEvent('user.refresh.applications', {
-            user_uuid: this.User.uuid,
-            applications: this.User.applications
-        }))
+        // console.log(UnitCustomer.data[0].relati);
+
+        // console.log("RUNNINGNINIGN")
+        // const unit_id = this.User.unit_id;
+        // const unit_applications = this.User.applications
+        // const profile = this.User.profile;
+
+        // if (unit_id === null || typeof unit_id === 'undefined') this.eventEmitter.emit('user.needs.unit_id', new UserAuthenticatedEvent('user.needs.unit_id'))
+        // if (profile === null || typeof profile === 'undefined') this.eventEmitter.emit('user.needs.profile', new UserAuthenticatedEvent('user.needs.profile'))
+        // if (unit_applications === null || unit_applications.length == 0 || typeof unit_applications === 'undefined') this.eventEmitter.emit('user.needs.applications', new UserAuthenticatedEvent('user.needs.applications'))
+        // else this.eventEmitter.emit('user.refresh.applications', new UserAuthenticatedEvent('user.refresh.applications', {
+        //     user_uuid: this.User.uuid,
+        //     applications: this.User.applications
+        // }))
 
     }
 

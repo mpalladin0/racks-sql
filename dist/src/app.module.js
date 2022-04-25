@@ -31,11 +31,18 @@ const fees_model_1 = require("./accounts/models/fees.model");
 const limits_model_1 = require("./accounts/models/limits.model");
 const application_model_1 = require("./applications/application.model");
 const application_documents_model_1 = require("./applications/documents/application-documents.model");
+const webhook_module_1 = require("./webhook/webhook.module");
+const config_module_1 = require("./config/config.module");
+const bank_module_1 = require("./bank/bank.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            bank_module_1.BankModule.forRoot({
+                api_token: 'ttt',
+                url: 'ttt'
+            }),
             event_emitter_1.EventEmitterModule.forRoot({
                 wildcard: true,
             }),
@@ -77,7 +84,9 @@ AppModule = __decorate([
                         limits_model_1.LimitsModel
                     ],
                 }
-            })
+            }),
+            webhook_module_1.WebhookModule,
+            config_module_1.ConfigModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

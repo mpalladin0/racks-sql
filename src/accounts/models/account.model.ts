@@ -17,7 +17,6 @@ export class AccountModel extends Model {
     account_uuid: string
 
     @ForeignKey(() => User)
-    // @Column
     user_uuid: string;
 
     @BelongsTo(() => User, 'user_uuid')
@@ -51,10 +50,10 @@ export class AccountModel extends Model {
     @Column({ allowNull: false, defaultValue: 0 })
     available: number
 
-    @Column({ allowNull: false, defaultValue: "" })
+    @Column
     routing_number: string
 
-    @Column({ allowNull: false, defaultValue: "" })
+    @Column
     account_number: string
 
     // @HasMany(() => User)

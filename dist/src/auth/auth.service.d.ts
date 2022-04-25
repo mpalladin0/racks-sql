@@ -33,5 +33,5 @@ export declare class AuthService {
         _model: import("sequelize/types").Model<any, any>;
     }>;
     login(user: any): Promise<UserAuthenticatedJWTPayload>;
-    getNeeded(): Promise<void>;
+    getNeeded(user_uuid: any): Promise<void>;
 }

@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const swagger_1 = require("@nestjs/swagger");
-const local_auth_guard_1 = require("../auth/local-auth.guard");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -43,7 +42,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(local_auth_guard_1.LocalAuthGuard),
     (0, common_1.Get)(':uuid'),
     __param(0, (0, common_1.Param)('uuid')),
     __metadata("design:type", Function),

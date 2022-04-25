@@ -16,14 +16,16 @@ exports.ProfileService = void 0;
 const common_1 = require("@nestjs/common");
 const event_emitter_1 = require("@nestjs/event-emitter");
 const sequelize_1 = require("@nestjs/sequelize");
+const racksbank_service_1 = require("../bank/racksbank.service");
 const user_model_1 = require("../user/models/user.model");
 const ProfileDeleted_event_1 = require("./events/ProfileDeleted.event");
 const name_model_1 = require("./models/name.model");
 const profile_model_1 = require("./models/profile.model");
 const residence_model_1 = require("./models/residence.model");
 let ProfileService = class ProfileService {
-    constructor(eventEmitter, nameModel, profileModel, userModel) {
+    constructor(eventEmitter, bank, nameModel, profileModel, userModel) {
         this.eventEmitter = eventEmitter;
+        this.bank = bank;
         this.nameModel = nameModel;
         this.profileModel = profileModel;
         this.userModel = userModel;
@@ -138,10 +140,11 @@ __decorate([
 ], ProfileService.prototype, "handleProfileEvents", null);
 ProfileService = __decorate([
     (0, common_1.Injectable)(),
-    __param(1, (0, sequelize_1.InjectModel)(name_model_1.Name)),
-    __param(2, (0, sequelize_1.InjectModel)(profile_model_1.Profile)),
-    __param(3, (0, sequelize_1.InjectModel)(user_model_1.User)),
-    __metadata("design:paramtypes", [event_emitter_1.EventEmitter2, Object, Object, Object])
+    __param(2, (0, sequelize_1.InjectModel)(name_model_1.Name)),
+    __param(3, (0, sequelize_1.InjectModel)(profile_model_1.Profile)),
+    __param(4, (0, sequelize_1.InjectModel)(user_model_1.User)),
+    __metadata("design:paramtypes", [event_emitter_1.EventEmitter2,
+        racksbank_service_1.RacksBank, Object, Object, Object])
 ], ProfileService);
 exports.ProfileService = ProfileService;
 //# sourceMappingURL=profile.service.js.map

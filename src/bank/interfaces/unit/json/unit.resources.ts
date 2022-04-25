@@ -1,0 +1,1 @@
+import *  as IndividualCustomer from './IndividualCustomer.resource.json';

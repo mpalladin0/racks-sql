@@ -1,4 +1,5 @@
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { RacksBank } from 'src/bank/racksbank.service';
 import { User as UserModel } from 'src/user/models/user.model';
 import { CreateProfileDto } from './dto/profile/create-profile.dto';
 import { ProfileCreatedEvent } from './events/ProfileCreated.event';
@@ -7,10 +8,11 @@ import { Name as NameModel } from './models/name.model';
 import { Profile as ProfileModel } from './models/profile.model';
 export declare class ProfileService {
     private eventEmitter;
+    private bank;
     private readonly nameModel;
     private readonly profileModel;
     private readonly userModel;
-    constructor(eventEmitter: EventEmitter2, nameModel: typeof NameModel, profileModel: typeof ProfileModel, userModel: typeof UserModel);
+    constructor(eventEmitter: EventEmitter2, bank: RacksBank, nameModel: typeof NameModel, profileModel: typeof ProfileModel, userModel: typeof UserModel);
     findOneByUserUUID(user_uuid: string): Promise<any>;
     findAllByUserUUID(user_uuid: string): Promise<any>;
     createProfile(user_uuid: string, createProfileDto: CreateProfileDto): Promise<any>;

@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Unit } from '@unit-finance/unit-node-sdk';
 import { Profile } from 'src/profile/models/profile.model';
 import { User } from 'src/user/models/user.model';
@@ -6,20 +7,30 @@ import { CreateApplicationFormDto } from './forms/dto/create-application-form.dt
 import { ApplicationFormModel } from './forms/application-form.model';
 import { ApplicationModel } from './application.model';
 import { ApplicationDocumentsModel } from './documents/application-documents.model';
+import { CreatApplicationFormDtoSimulationTypes, CreateApplicationFormSimulationDto } from './forms/dto/create-application-form-simulate.dto';
+import { SimulateApplicationEventDto } from './submitted/dto/simulate-application-event.dto';
+import { HttpService } from '@nestjs/axios';
+import { ApplicationStatusEvent } from './submitted/event/ApplicationStatus.event';
 export declare class ApplicationsService {
     private readonly logger;
+    private httpService;
+    private readonly eventEmitter;
     private readonly userModel;
     private readonly profileModel;
     private readonly applicationModel;
     private readonly applicationDocumentsModel;
     private readonly applicationFormModel;
     unit: Unit;
-    constructor(logger: Logger, userModel: typeof User, profileModel: typeof Profile, applicationModel: typeof ApplicationModel, applicationDocumentsModel: typeof ApplicationDocumentsModel, applicationFormModel: typeof ApplicationFormModel);
+    constructor(logger: Logger, httpService: HttpService, eventEmitter: EventEmitter2, userModel: typeof User, profileModel: typeof Profile, applicationModel: typeof ApplicationModel, applicationDocumentsModel: typeof ApplicationDocumentsModel, applicationFormModel: typeof ApplicationFormModel);
     createApplication(createApplicationFormDto: CreateApplicationFormDto): Promise<any>;
     createUnitApplicationForm(user_uuid: string, first_name: string, middle_name: string, last_name: string): Promise<any>;
-    findAllApplicationFormsByUserUUID(user_uuid: string): Promise<ApplicationFormModel[]>;
+    createApplication_Simulate(createApplicationFormSimulateDto: CreateApplicationFormSimulationDto): Promise<any>;
+    simulate_ApplicationEvent(simulateApplicationEventDto: SimulateApplicationEventDto): Promise<void>;
+    createUnitApplicationForm_Simulate(user_uuid: string, first_name: string, middle_name: string, last_name: string, simulation_type: CreatApplicationFormDtoSimulationTypes): Promise<any>;
+    findAllSubmitted_by_UserUUID_from_Unit(user_uuid: string): Promise<void>;
     findOne_by_ApplicationFormUUID(application_form_uuid: string): Promise<any>;
     findOne_by_ApplicationUUID(application_uuid: string): Promise<any>;
     findAll_Applications_by_UserUUID(user_uuid: string): Promise<ApplicationModel[]>;
     setUnitIDForUser(user_uuid: string): Promise<any>;
+    handleApplcationStatusEvent(payload: ApplicationStatusEvent): Promise<void>;
 }

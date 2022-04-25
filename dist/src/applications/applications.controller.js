@@ -20,6 +20,8 @@ const secrets_constants_1 = require("../../secrets/secrets.constants");
 const applications_service_1 = require("./applications.service");
 const create_application_form_dto_1 = require("./forms/dto/create-application-form.dto");
 const application_model_1 = require("./application.model");
+const create_application_form_simulate_dto_1 = require("./forms/dto/create-application-form-simulate.dto");
+const simulate_application_event_dto_1 = require("./submitted/dto/simulate-application-event.dto");
 let ApplicationsController = class ApplicationsController {
     constructor(logger, applicationsService) {
         this.logger = logger;
@@ -27,14 +29,19 @@ let ApplicationsController = class ApplicationsController {
         this.unit = new unit_node_sdk_1.Unit(secrets_constants_1.UNIT_API_TOKEN, secrets_constants_1.UNTI_API_ENDPOINT_URL);
     }
     createApplicationForm(createApplicationForm) {
-        this.logger.warn("Creating Application...", createApplicationForm);
         return this.applicationsService.createApplication(createApplicationForm);
+    }
+    createApplication_Simulate(createApplicationFormSimulation) {
+        return this.applicationsService.createApplication_Simulate(createApplicationFormSimulation);
+    }
+    simulateApplicationEvent(simulateApplicationEveneDto) {
+        return this.applicationsService.simulate_ApplicationEvent(simulateApplicationEveneDto);
     }
     findOneByApplicationUUID(application_uuid) {
         return this.applicationsService.findOne_by_ApplicationUUID(application_uuid);
     }
-    async findAllForUser(user_uuid) {
-        return this.applicationsService.findAll_Applications_by_UserUUID(user_uuid);
+    async findAllSubmittedUser(user_uuid) {
+        return this.applicationsService.findAllSubmitted_by_UserUUID_from_Unit(user_uuid);
     }
     async webhook(payload) {
         payload.data.forEach(response => {
@@ -82,6 +89,25 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ApplicationsController.prototype, "createApplicationForm", null);
 __decorate([
+    (0, swagger_1.ApiBody)({ type: [create_application_form_dto_1.CreateApplicationFormDto] }),
+    (0, common_1.Post)('create/simulate'),
+    (0, swagger_1.ApiCreatedResponse)({
+        description: 'The application form has been successfully created.',
+        type: application_model_1.ApplicationModel.name,
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_application_form_simulate_dto_1.CreateApplicationFormSimulationDto]),
+    __metadata("design:returntype", void 0)
+], ApplicationsController.prototype, "createApplication_Simulate", null);
+__decorate([
+    (0, common_1.Post)('simulate'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [simulate_application_event_dto_1.SimulateApplicationEventDto]),
+    __metadata("design:returntype", void 0)
+], ApplicationsController.prototype, "simulateApplicationEvent", null);
+__decorate([
     (0, common_1.Get)(':application_uuid'),
     __param(0, (0, common_1.Param)('application_uuid')),
     __metadata("design:type", Function),
@@ -89,12 +115,12 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ApplicationsController.prototype, "findOneByApplicationUUID", null);
 __decorate([
-    (0, common_1.Get)(':user_uuid/all'),
+    (0, common_1.Get)(':user_uuid/submitted/all'),
     __param(0, (0, common_1.Param)('user_uuid')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], ApplicationsController.prototype, "findAllForUser", null);
+], ApplicationsController.prototype, "findAllSubmittedUser", null);
 __decorate([
     (0, common_1.Post)('webhook'),
     __param(0, (0, common_1.Body)()),

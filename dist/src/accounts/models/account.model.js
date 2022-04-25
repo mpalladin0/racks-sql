@@ -62,11 +62,11 @@ __decorate([
     __metadata("design:type", Number)
 ], AccountModel.prototype, "available", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, defaultValue: "" }),
+    sequelize_typescript_1.Column,
     __metadata("design:type", String)
 ], AccountModel.prototype, "routing_number", void 0);
 __decorate([
-    (0, sequelize_typescript_1.Column)({ allowNull: false, defaultValue: "" }),
+    sequelize_typescript_1.Column,
     __metadata("design:type", String)
 ], AccountModel.prototype, "account_number", void 0);
 AccountModel = __decorate([

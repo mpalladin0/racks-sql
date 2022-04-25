@@ -22,21 +22,16 @@ import { FeesModel } from './accounts/models/fees.model';
 import { LimitsModel } from './accounts/models/limits.model';
 import { ApplicationModel } from './applications/application.model';
 import { ApplicationDocumentsModel } from './applications/documents/application-documents.model';
-// import { WinstonModule, utilities } from 'nest-winston';
+import { WebhookModule } from './webhook/webhook.module';
+import { ConfigModule } from './config/config.module';
+import { BankModule } from './bank/bank.module';
 // import winston from 'winston';
 @Module({
   imports: [
-    // WinstonModule.forRoot({
-    //   transports: [
-    //     new winston.transports.Console({
-    //       format: winston.format.combine(
-    //         winston.format.timestamp(),
-    //         winston.format.ms(),
-    //       ),
-    //     }),
-    //     // other transports...
-    //   ],
-    // }),
+    BankModule.forRoot({ 
+      api_token: 'ttt',
+      url: 'ttt'
+     }),
     EventEmitterModule.forRoot({
       wildcard: true,
     }),
@@ -79,7 +74,9 @@ import { ApplicationDocumentsModel } from './applications/documents/application-
         ],
 
       }
-    })
+    }),
+    WebhookModule,
+    ConfigModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -17,11 +17,13 @@ const axios_1 = require("@nestjs/axios");
 const profile_module_1 = require("../profile/profile.module");
 const application_documents_model_1 = require("./documents/application-documents.model");
 const application_model_1 = require("./application.model");
+const event_emitter_1 = require("@nestjs/event-emitter");
 let ApplicationsModule = class ApplicationsModule {
 };
 ApplicationsModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            event_emitter_1.EventEmitterModule,
             axios_1.HttpModule,
             profile_module_1.ProfileModule,
             user_module_1.UserModule,

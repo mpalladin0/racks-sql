@@ -17,11 +17,13 @@ const deposit_product_model_1 = require("./models/deposit_product.model");
 const fees_model_1 = require("./models/fees.model");
 const limits_model_1 = require("./models/limits.model");
 const limits_durations_model_1 = require("./models/limits.durations.model");
+const user_module_1 = require("../user/user.module");
 let AccountsModule = class AccountsModule {
 };
 AccountsModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            user_module_1.UserModule,
             sequelize_1.SequelizeModule.forFeature([
                 account_model_1.AccountModel,
                 deposit_product_model_1.DepositProductModel,

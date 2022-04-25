@@ -9,9 +9,11 @@ import { HttpModule } from '@nestjs/axios';
 import { ProfileModule } from 'src/profile/profile.module';
 import { ApplicationDocumentsModel } from './documents/application-documents.model';
 import { ApplicationModel } from './application.model';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule,
     HttpModule,
     ProfileModule,
     UserModule,
